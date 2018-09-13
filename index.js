@@ -2,7 +2,6 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const config = require("./config.json");
 
-const say = require("./commands/say.js");
 const boop = require("./commands/boop.js");
 const utils = require("./commands/utils.js");
 const reddit = require("./commands/reddit.js");
@@ -52,7 +51,7 @@ client.on("message", async message => {
       break;
     }
     case "say": {
-      await say.execute(message, args);
+      await utils.say(message, args);
       break;
     }
     case "boop": {
