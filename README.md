@@ -1,1 +1,2 @@
-Just leave me alone :<
+Dependencies:
+discord.js (https://www.npmjs.com/package/discord.js)
