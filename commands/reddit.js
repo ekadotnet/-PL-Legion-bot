@@ -49,8 +49,8 @@ getTopImage = (message, data) => {
   let time = data.timeOptions || "all";
   let user = message.author.id;
 
-  if(!checkTimeRangeOption(data.timeOptions)) {
-    await message.channel.send(
+  if (!checkTimeRangeOption(data.timeOptions)) {
+    message.channel.send(
       `<@${user}> you passed wrong time range option, correct ones are: all, hour, day, week, month, year`
     );
     return;
