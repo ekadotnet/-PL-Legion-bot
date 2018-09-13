@@ -41,9 +41,20 @@ getHotImage = (message, data) => {
   }
 };
 
+checkTimeRangeOption = option => {
+  return time.includes(option);
+};
+
 getTopImage = (message, data) => {
   let time = data.timeOptions || "all";
   let user = message.author.id;
+
+  if(!checkTimeRangeOption(data.timeOptions)) {
+    await message.channel.send(
+      `<@${user}> you passed wrong time range option, correct ones are: all, hour, day, week, month, year`
+    );
+    return;
+  }
 
   try {
     r.getSubreddit(data.subreddit)
