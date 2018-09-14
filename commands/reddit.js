@@ -16,9 +16,6 @@ getHotImage = (message, data) => {
 
   try {
     r.getSubreddit(data.subreddit)
-      .catch(() => {
-        errorMsg(message, user);
-      })
       .getHot()
       .map(submission => ({
         link: submission.url,
@@ -35,6 +32,9 @@ getHotImage = (message, data) => {
             data.subreddit
           } for you! owo\n${post}`
         );
+      })
+      .catch(() => {
+        errorMsg(message, user);
       });
   } catch (error) {
     errorMsg(message, user);
@@ -58,9 +58,6 @@ getTopImage = (message, data) => {
 
   try {
     r.getSubreddit(data.subreddit)
-      .catch(() => {
-        errorMsg(message, user);
-      })
       .getTop({ time: time })
       .map(submission => ({
         link: submission.url,
@@ -77,6 +74,9 @@ getTopImage = (message, data) => {
             data.subreddit
           } for you! owo\n${post}`
         );
+      })
+      .catch(() => {
+        errorMsg(message, user);
       });
   } catch (error) {
     errorMsg(message, user);
