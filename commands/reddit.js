@@ -107,7 +107,7 @@ getImage = async (message, args) => {
             value: `[hot/top] [all/hour/day/week/month/year]`
           },
           {
-            name: `Examples`,
+            name: `Examples:`,
             value: `!r zettairyouiki || !r zettairyouiki hot || !r zettairyouiki top all`
           }
         ]
