@@ -66,6 +66,13 @@ client.on("message", async message => {
       await danbooru.getMomo(message, args);
       break;
     }
+    case "commands":
+    case "help": {
+      await utils.help(message, args);
+      break;
+    }
+    default:
+      await message.channel.send(`Unknown command !${command}. Try !help or !commands to get more info.`)
   }
 });
 
