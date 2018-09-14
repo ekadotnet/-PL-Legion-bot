@@ -87,7 +87,7 @@ help = async (message, args) => {
       fields: [
         {
           name: `Available commands:`,
-          value: `**!ping !me !say !boop !r !momo !commands !help**\nTo get more specific info type:\n**!command help** (for example: **!r help**)`
+          value: `**!ping !me !say !boop !r !momo !commands !help**\nTo get more specific info:\n**!command help** (for example: **!r help**)`
         },
         { name: `Author:`, value: `EnjoyTheNoise#2702` }
       ]
