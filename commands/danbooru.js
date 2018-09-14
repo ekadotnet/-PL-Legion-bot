@@ -15,7 +15,7 @@ getMomo = async (message, args) => {
         fields: [
           { name: `Usage:`, value: `!momo [nsfw]` },
           { name: `Optional parameters:`, value: `[nsfw]` },
-          { name: `Examples`, value: `!momo || !momo nsfw` }
+          { name: `Examples:`, value: `!momo || !momo nsfw` }
         ]
       }
     });
