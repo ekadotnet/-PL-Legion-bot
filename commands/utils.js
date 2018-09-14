@@ -33,7 +33,7 @@ me = async (message, args, user) => {
         fields: [
           { name: `Usage:`, value: `!me [activity]` },
           { name: `Optional parameters:`, value: `none` },
-          { name: `Examples`, value: `!me watching anime` }
+          { name: `Examples:`, value: `!me watching anime` }
         ]
       }
     });
@@ -62,7 +62,7 @@ say = async (message, args) => {
         fields: [
           { name: `Usage:`, value: `!say [text]` },
           { name: `Optional parameters:`, value: `none` },
-          { name: `Examples`, value: `!say Kiana best girl` }
+          { name: `Examples:`, value: `!say Kiana best girl` }
         ]
       }
     });
@@ -70,17 +70,34 @@ say = async (message, args) => {
     const say = args.join(" ");
     message.delete().catch(O_o => {});
     if (say === "" || say === null) {
-      await message.channel.send(
-        "Co mam się kurwa domyśleć co powiedzieć? Daj jakiś tekścior ziomek"
-      );
+      await message.channel.send(`What am I supposed to say? >:(`);
     } else {
       await message.channel.send(say);
     }
   }
 };
 
+help = async (message, args) => {
+  let user = message.author.id;
+
+  await message.channel.send(`<@${user}>`, {
+    embed: {
+      title: `Who am I?`,
+      description: `Simple, lewd oriented bot for [PL]Legion armada`,
+      fields: [
+        {
+          name: `Available commands:`,
+          value: `**!ping !me !say !boop !r !momo !commands !help**\nTo get more specific info type:\n**!command help** (for example: **!r help**)`
+        },
+        { name: `Author:`, value: `EnjoyTheNoise#2702` }
+      ]
+    }
+  });
+};
+
 module.exports = {
   ping: ping,
   me: me,
-  say: say
+  say: say,
+  help: help
 };
