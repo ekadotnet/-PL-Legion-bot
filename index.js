@@ -2,11 +2,9 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const config = require("./config.json");
 
-const say = require("./commands/say.js");
 const boop = require("./commands/boop.js");
 const utils = require("./commands/utils.js");
 const reddit = require("./commands/reddit.js");
-const weeb = require("./commands/weeb.js");
 const danbooru = require("./commands/danbooru.js");
 
 client.on("ready", () => {
@@ -45,27 +43,23 @@ client.on("message", async message => {
 
   switch (command) {
     case "ping": {
-      await utils.ping(message);
+      await utils.ping(message, args);
       break;
     }
     case "me": {
-      await utils.me(message, args, message.author.username);
+      await utils.me(message, args);
       break;
     }
     case "say": {
-      await say.execute(message, args);
+      await utils.say(message, args);
       break;
     }
     case "boop": {
-      await boop.execute(message);
+      await boop.execute(message, args);
       break;
     }
     case "r": {
       await reddit.getImage(message, args);
-      break;
-    }
-    case "lick": {
-      await weeb.lick(message);
       break;
     }
     case "momo": {

@@ -9,6 +9,8 @@ const r = new snoowrap({
   refreshToken: config.reddit.refreshToken
 });
 
+const time = ["all", "hour", "day", "week", "month", "year"];
+
 getHotImage = (message, data) => {
   let user = message.author.id;
 
@@ -39,9 +41,20 @@ getHotImage = (message, data) => {
   }
 };
 
+checkTimeRangeOption = option => {
+  return time.includes(option);
+};
+
 getTopImage = (message, data) => {
   let time = data.timeOptions || "all";
   let user = message.author.id;
+
+  if (!checkTimeRangeOption(data.timeOptions)) {
+    message.channel.send(
+      `<@${user}> you passed wrong time range option, correct ones are: all, hour, day, week, month, year`
+    );
+    return;
+  }
 
   try {
     r.getSubreddit(data.subreddit)
@@ -77,73 +90,62 @@ errorMsg = (message, user) => {
 };
 
 getImage = async (message, args) => {
-  let data = {
-    subreddit: args[0],
-    type: args[1],
-    timeOptions: args[2]
-  };
+  if (args[0] === "help") {
+    let user = message.author.id;
 
-  if (data.subreddit === undefined || data.subreddit === "") {
-    message.channel.send(
-      `<@${message.author.id}> GIMME SUBREDDIT NAME DAMMIT >:(`
-    );
-    return;
-  }
-
-  switch (data.type) {
-    case undefined:
-    case "":
-    case "hot": {
-      getHotImage(message, data);
-      break;
-    }
-    case "top": {
-      getTopImage(message, data);
-      break;
-    }
-    default: {
-      message.channel.send("You gave me wrong parameters uwu");
-      break;
-    }
-  }
-};
-
-getImage_Old = async (message, args) => {
-  //why did I left this here?
-  //https://developers.google.com/web/updates/2015/03/introduction-to-fetch
-  let response;
-  if (args[0] === null || args[0] === "") {
-    message.channel.send("GIMME SUBREDDIT NAME DAMMIT >:(");
-  } else {
-  }
-  fetch(`https://www.reddit.com/r/${args[0]}.json`)
-    .then(res => res.json())
-    .then(json =>
-      json.data.children
-        .slice(0, 20)
-        .map(post => ({
-          link: post.data.url,
-          img: post.data.thumbnail,
-          stickied: post.data.stickied
-        }))
-        .filter(post => post.stickied !== true)
-        .filter(post => post.img !== "self")
-    )
-    .then(posts => {
-      // posts.forEach(post => {
-      //   message.channel.send(post.link);
-      // })
-      let post = posts[Math.floor(Math.random() * posts.length)].link;
-      let user = message.author.id;
-      message.channel.send(
-        `<@${user}> here's random hot image from r/${
-          args[0]
-        } for you! owo\n${post}`
-      );
+    await message.channel.send(`<@${user}>`, {
+      embed: {
+        title: `!r`,
+        description: `Gets random image from given subreddit's hot or top page`,
+        fields: [
+          {
+            name: `Usage:`,
+            value: `!r [**subreddit_name**] [**hot**/top] [**all**/hour/day/week/month/year]`
+          },
+          {
+            name: `Optional parameters:`,
+            value: `[hot/top] [all/hour/day/week/month/year]`
+          },
+          {
+            name: `Examples`,
+            value: `!r zettairyouiki || !r zettairyouiki hot || !r zettairyouiki top all`
+          }
+        ]
+      }
     });
+  } else {
+    let data = {
+      subreddit: args[0],
+      type: args[1],
+      timeOptions: args[2]
+    };
+
+    if (data.subreddit === undefined || data.subreddit === "") {
+      message.channel.send(
+        `<@${message.author.id}> GIMME SUBREDDIT NAME DAMMIT >:(`
+      );
+      return;
+    }
+
+    switch (data.type) {
+      case undefined:
+      case "":
+      case "hot": {
+        getHotImage(message, data);
+        break;
+      }
+      case "top": {
+        getTopImage(message, data);
+        break;
+      }
+      default: {
+        message.channel.send("You gave me wrong parameters uwu");
+        break;
+      }
+    }
+  }
 };
 
 module.exports = {
-  getImage: getImage,
-  getImage_Old: getImage_Old
+  getImage: getImage
 };
