@@ -1,4 +1,4 @@
-ping = async (message, args) => {
+ping = async (message, args, client) => {
   if (args[0] === "help") {
     let user = message.author.id;
 
@@ -16,8 +16,7 @@ ping = async (message, args) => {
   } else {
     const m = await message.channel.send("Ping?");
     m.edit(
-      `Pong! Latency is ${m.createdTimestamp -
-        message.createdTimestamp}ms. Latency is ${Math.round(client.ping)}ms`
+      `Pong!\nLatency: ${m.createdTimestamp - message.createdTimestamp}ms.\nAPI: ${Math.round(client.ping)}ms`
     );
   }
 };

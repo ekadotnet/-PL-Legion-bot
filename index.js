@@ -43,7 +43,7 @@ client.on("message", async message => {
 
   switch (command) {
     case "ping": {
-      await utils.ping(message, args);
+      await utils.ping(message, args, client);
       break;
     }
     case "me": {
