@@ -31,6 +31,10 @@ client.on("guildDelete", guild => {
   client.user.setActivity(`Serving ${client.guilds.size} servers`);
 });
 
+client.on("error", error => {
+  console.log(`${error.name} error occured:\n${error.message}`);
+});
+
 client.on("message", async message => {
   if (message.author.bot) return;
   if (message.content.indexOf(config.prefix) !== 0) return;
@@ -72,7 +76,9 @@ client.on("message", async message => {
       break;
     }
     default:
-      await message.channel.send(`Unknown command !${command}. Try !help or !commands to get more info.`)
+      await message.channel.send(
+        `Unknown command !${command}. Try !help or !commands to get more info.`
+      );
   }
 });
 
