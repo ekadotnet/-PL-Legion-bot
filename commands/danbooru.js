@@ -52,6 +52,64 @@ getMomo = async (message, args) => {
   }
 };
 
+getImage = async (message, args) => {
+  let user = message.author.id;
+
+  if (args[0] === "help") {
+    await message.channel.send(`<@${user}>`, {
+      embed: {
+        title: `!danbooru`,
+        description: `Gets random image from danbooru with given tags\nNote: passing no tags will select completely random image from first page`,
+        fields: [
+          { name: `Usage:`, value: `!danbooru [tags]` },
+          { name: `Optional parameters:`, value: `[tags]` },
+          { name: `Examples:`, value: `!danbooru || !danbooru kiana_kaslana` }
+        ]
+      }
+    });
+  } else {
+    if (args.length > 2) {
+      await message.channel.send(`<@${user}> you gave me too much tags uwu`);
+      return;
+    }
+
+    let tags = [args[0] || "", args[1] || ""];
+
+    booru
+      .posts({
+        tags: `${tags[0]} ${tags[1]}`
+      })
+      .then(posts => {
+        if (posts.length === 0) {
+          message.channel.send(
+            `<@${user}> I found 0 images with given tags, are you sure they're correct?`
+          );
+          return;
+        }
+
+        const index = Math.floor(Math.random() * posts.length);
+        const post = posts[index];
+        const url = booru.url(post.large_file_url);
+        const originalImage = booru.url(post.file_url);
+
+        message.channel
+          .send(
+            tags[0] === "" && tags[1] === ""
+              ? `<@${user}> here's random image\n${url}`
+              : `<@${user}> here's random image with tag(s): ${tags[0]} ${
+                  tags[1]
+                }\n${url}`
+          )
+          .then(() =>
+            message.channel.send({
+              embed: { description: `[Full image](${originalImage})` }
+            })
+          );
+      });
+  }
+};
+
 module.exports = {
-  getMomo: getMomo
+  getMomo: getMomo,
+  getImage: getImage
 };
