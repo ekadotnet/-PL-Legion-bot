@@ -70,6 +70,10 @@ client.on("message", async message => {
       await danbooru.getMomo(message, args);
       break;
     }
+    case "danbooru": {
+      await danbooru.getImage(message, args);
+      break;
+    }
     case "commands":
     case "help": {
       await utils.help(message, args);
