@@ -42,20 +42,15 @@ getMomo = async (message, args) => {
       .then(posts => {
         const index = Math.floor(Math.random() * posts.length);
         const post = posts[index];
-        const url = booru.url(post.large_file_url);
-        const originalImage = booru.url(post.file_url);
+        const imgData = {
+          title: `<Here's random ${
+            nsfw ? "and (probably) nsfw " : ""
+          }Momo image for you! owo`,
+          description: `[Full image](${booru.url(post.file_url)})`,
+          url: `${booru.url(post.large_file_url)}`
+        };
 
-        message.channel
-          .send(
-            `<@${user}> here's random ${
-              nsfw ? "and (probably) nsfw " : ""
-            }Momo image for you! owo\n${url}`
-          )
-          .then(() =>
-            message.channel.send({
-              embed: { description: `[Full image](${originalImage})` }
-            })
-          );
+        helper.sendImage(message.channel, message.author.id, imgData);
       });
   }
 };
@@ -66,7 +61,7 @@ getImage = async (message, args) => {
   if (args[0] === "help") {
     const helpData = {
       title: `!danbooru`,
-      description: `Gets random image from danbooru with given tags (max. **2**)\nNote: passing no tags will select completely random image from the first page`,
+      description: `Gets random image from danbooru with given tag(s) (max. **2**)\nNote: passing no tags will select completely random image from the first page`,
       fields: [
         {
           name: `Usage:`,
@@ -82,7 +77,7 @@ getImage = async (message, args) => {
         },
         {
           name: `**Important:**`,
-          value: `Remember that passed tag must be a **valid** danbooru tag!`
+          value: `Remember that passed tag(s) must be a **valid** danbooru tag!`
         }
       ]
     };
@@ -102,29 +97,23 @@ getImage = async (message, args) => {
       .then(posts => {
         if (posts.length === 0) {
           message.channel.send(
-            `<@${user}> I found 0 images with given tags, are you sure they're correct?`
+            `<@${user}> I found 0 images with given tag(s), are you sure they're correct?`
           );
           return;
         }
 
         const index = Math.floor(Math.random() * posts.length);
         const post = posts[index];
-        const url = booru.url(post.large_file_url);
-        const originalImage = booru.url(post.file_url);
-
-        message.channel
-          .send(
+        const imgData = {
+          title:
             tags[0] === "" && tags[1] === ""
-              ? `<@${user}> here's random image\n${url}`
-              : `<@${user}> here's random image with tag(s): ${tags[0]} ${
-                  tags[1]
-                }\n${url}`
-          )
-          .then(() =>
-            message.channel.send({
-              embed: { description: `[Full image](${originalImage})` }
-            })
-          );
+              ? `Here's random image`
+              : `Here's random image with tag(s): ${tags[0]} ${tags[1]}`,
+          description: `[Full image](${booru.url(post.file_url)})`,
+          url: `${booru.url(post.large_file_url)}`
+        };
+
+        helper.sendImage(message.channel, message.author.id, imgData);
       });
   }
 };

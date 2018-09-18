@@ -25,13 +25,13 @@ getHotImage = (message, data) => {
       .filter(submission => submission.stickied !== true)
       .filter(submission => submission.thumbnail !== "self")
       .then(submissions => {
-        let post =
-          submissions[Math.floor(Math.random() * submissions.length)].link;
-        message.channel.send(
-          `<@${user}> here's random hot image from r/${
-            data.subreddit
-          } for you! owo\n${post}`
-        );
+        let post = submissions[Math.floor(Math.random() * submissions.length)];
+        let imgData = {
+          title: `Here's random image from r/${data.subreddit} for you! owo`,
+          description: `[Full image](${post.link})`,
+          url: post.link
+        };
+        helper.sendImage(message.channel, user, imgData);
       })
       .catch(() => {
         errorMsg(message, user);
@@ -67,13 +67,15 @@ getTopImage = (message, data) => {
       .filter(submission => submission.stickied !== true)
       .filter(submission => submission.thumbnail !== "self")
       .then(submissions => {
-        let post =
-          submissions[Math.floor(Math.random() * submissions.length)].link;
-        message.channel.send(
-          `<@${user}> here's random top image (range: ${time}) from r/${
+        let post = submissions[Math.floor(Math.random() * submissions.length)];
+        let imgData = {
+          title: `Here's random top image (range: ${time}) from r/${
             data.subreddit
-          } for you! owo\n${post}`
-        );
+          } for you! owo`,
+          description: `[Full image](${post.link})`,
+          url: post.link
+        };
+        helper.sendImage(message.channel, user, imgData);
       })
       .catch(() => {
         errorMsg(message, user);
