@@ -1,8 +1,7 @@
 const Danbooru = require("danbooru");
-const config = require("../config.json");
 
 // Perform a search for popular image posts
-const booru = new Danbooru(config.danbooru.login + ":" + config.danbooru.key);
+const booru = new Danbooru(process.env.DANBOORU_LOGIN + ":" + process.env.DANBOORU_KEY);
 
 getMomo = async (message, args) => {
   if (args[0] === "help") {

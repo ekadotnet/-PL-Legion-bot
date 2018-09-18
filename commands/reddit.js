@@ -1,12 +1,11 @@
 const fetch = require("node-fetch");
 const snoowrap = require("snoowrap");
-const config = require("../config.json");
 
 const r = new snoowrap({
-  userAgent: config.reddit.useragent,
-  clientId: config.reddit.redditId,
-  clientSecret: config.reddit.redditSecret,
-  refreshToken: config.reddit.refreshToken
+  userAgent: process.env.REDDIT_USER_AGENT,
+  clientId: process.env.REDDIT_ID,
+  clientSecret: process.env.REDDIT_SECRET,
+  refreshToken: process.env.REDDIT_REFRESH_TOKEN
 });
 
 const time = ["all", "hour", "day", "week", "month", "year"];

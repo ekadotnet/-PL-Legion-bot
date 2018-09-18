@@ -1,6 +1,5 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const config = require("./config.json");
 
 const boop = require("./commands/boop.js");
 const utils = require("./commands/utils.js");
@@ -37,10 +36,10 @@ client.on("error", error => {
 
 client.on("message", async message => {
   if (message.author.bot) return;
-  if (message.content.indexOf(config.prefix) !== 0) return;
+  if (message.content.indexOf(process.env.PREFIX) !== 0) return;
 
   const args = message.content
-    .slice(config.prefix.length)
+    .slice(process.env.PREFIX.length)
     .trim()
     .split(/ +/g); //KIANA BEST GIRL
   const command = args.shift().toLowerCase();
@@ -86,4 +85,4 @@ client.on("message", async message => {
   }
 });
 
-client.login(config.token);
+client.login(process.env.TOKEN);
