@@ -22,7 +22,7 @@ ping = async (message, args, client) => {
         }
       ]
     };
-    await helper.getHelp(message, user, helpData);
+    await helper.getHelp(message.channel, user, helpData);
   } else {
     const m = await message.channel.send("Ping?");
     m.edit(
@@ -54,7 +54,7 @@ me = async (message, args) => {
         }
       ]
     };
-    await helper.getHelp(message, user, helpData);
+    await helper.getHelp(message.channel, user, helpData);
   } else {
     const activity = args.join(" ");
     let username = message.author.username;
@@ -91,7 +91,7 @@ say = async (message, args) => {
         }
       ]
     };
-    await helper.getHelp(message, user, helpData);
+    await helper.getHelp(message.channel, user, helpData);
   } else {
     const say = args.join(" ");
     message.delete().catch(error => console.log(error));
@@ -116,7 +116,7 @@ help = async message => {
       { name: `Author:`, value: `EnjoyTheNoise#2702` }
     ]
   };
-  await helper.getHelp(message, user, helpData);
+  await helper.getHelp(message.channel, user, helpData);
 };
 
 module.exports = {

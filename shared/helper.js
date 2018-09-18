@@ -1,5 +1,5 @@
-getHelp = async (message, user, data) => {
-  await message.channel.send(`<@${user}>`, {
+getHelp = async (channel, user, data) => {
+  await channel.send(`<@${user}>`, {
     embed: {
       title: data.title,
       description: data.description,

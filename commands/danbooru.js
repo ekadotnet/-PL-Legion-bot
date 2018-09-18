@@ -6,7 +6,6 @@ const booru = new Danbooru(
 );
 
 getMomo = async (message, args) => {
-  let user = message.author.id;
   if (args[0] === "help") {
     const helpData = {
       title: `!momo`,
@@ -26,9 +25,8 @@ getMomo = async (message, args) => {
         }
       ]
     };
-    await helper.getHelp(message, user, helpData);
+    await helper.getHelp(message.channel, message.author.id, helpData);
   } else {
-    let user = message.author.id;
     let nsfw = args[0] === "nsfw" ? true : false;
     let page = Math.floor(Math.random() * 10);
 
@@ -56,12 +54,10 @@ getMomo = async (message, args) => {
 };
 
 getImage = async (message, args) => {
-  let user = message.author.id;
-
   if (args[0] === "help") {
     const helpData = {
       title: `!danbooru`,
-      description: `Gets random image from danbooru with given tag(s) (max. **2**)\nNote: passing no tags will select completely random image from the first page`,
+      description: `Gets random image from danbooru with given tag(s) (max. **2**)\n**Note:** passing no tags will select completely random image from the first page`,
       fields: [
         {
           name: `Usage:`,
@@ -81,10 +77,12 @@ getImage = async (message, args) => {
         }
       ]
     };
-    await helper.getHelp(message, user, helpData);
+    await helper.getHelp(message.channel, message.author.id, helpData);
   } else {
     if (args.length > 2) {
-      await message.channel.send(`<@${user}> you gave me too much tags uwu`);
+      await message.channel.send(
+        `<@${message.author.id}> you gave me too much tags uwu`
+      );
       return;
     }
 
@@ -97,7 +95,9 @@ getImage = async (message, args) => {
       .then(posts => {
         if (posts.length === 0) {
           message.channel.send(
-            `<@${user}> I found 0 images with given tag(s), are you sure they're correct?`
+            `<@${
+              message.author.id
+            }> I found 0 images with given tag(s), are you sure they're correct?`
           );
           return;
         }

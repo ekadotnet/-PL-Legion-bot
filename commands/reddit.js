@@ -12,8 +12,6 @@ const r = new snoowrap({
 const time = ["all", "hour", "day", "week", "month", "year"];
 
 getHotImage = (message, data) => {
-  let user = message.author.id;
-
   try {
     r.getSubreddit(data.subreddit)
       .getHot()
@@ -31,13 +29,13 @@ getHotImage = (message, data) => {
           description: `[Full image](${post.link})`,
           url: post.link
         };
-        helper.sendImage(message.channel, user, imgData);
+        helper.sendImage(message.channel, message.author.id, imgData);
       })
       .catch(() => {
-        errorMsg(message, user);
+        errorMsg(message.channel, message.author.id);
       });
   } catch (error) {
-    errorMsg(message, user);
+    errorMsg(message.channel, message.author.id);
   }
 };
 
@@ -47,11 +45,12 @@ checkTimeRangeOption = option => {
 
 getTopImage = (message, data) => {
   let time = data.timeOptions || "all";
-  let user = message.author.id;
 
   if (!checkTimeRangeOption(data.timeOptions)) {
     message.channel.send(
-      `<@${user}> you passed wrong time range option, correct ones are: all, hour, day, week, month, year`
+      `<@${
+        message.author.id
+      }> you passed wrong time range option, correct ones are: all, hour, day, week, month, year`
     );
     return;
   }
@@ -75,29 +74,27 @@ getTopImage = (message, data) => {
           description: `[Full image](${post.link})`,
           url: post.link
         };
-        helper.sendImage(message.channel, user, imgData);
+        helper.sendImage(message.channel, message.author.id, imgData);
       })
       .catch(() => {
-        errorMsg(message, user);
+        errorMsg(message.channel, message.author.id);
       });
   } catch (error) {
-    errorMsg(message, user);
+    errorMsg(message.channel, message.author.id);
   }
 };
 
-errorMsg = (message, user) => {
-  message.channel.send(
-    `<@${user}> something went wrong, maybe wrong subreddit name? uwu`
+errorMsg = async (channel, user) => {
+  await channel.send(
+    `<@${user}> something went wrong, maybe invalid subreddit name? uwu`
   );
 };
 
 getImage = async (message, args) => {
-  let user = message.author.id;
-
   if (args[0] === "help") {
     const helpData = {
       title: `!r`,
-      description: `Gets random image from given subreddit's hot or top page\nNote: pass time options only when getting images from "top"`,
+      description: `Gets random image from given subreddit's hot or top page\n**Note:** use time option only when getting images from top`,
       fields: [
         {
           name: `Usage:`,
@@ -117,7 +114,7 @@ getImage = async (message, args) => {
         }
       ]
     };
-    await helper.getHelp(message, user, helpData);
+    await helper.getHelp(message.channel, message.author.id, helpData);
   } else {
     let data = {
       subreddit: args[0],
@@ -126,7 +123,9 @@ getImage = async (message, args) => {
     };
 
     if (data.subreddit === undefined || data.subreddit === "") {
-      message.channel.send(`<@${user}> GIMME SUBREDDIT NAME DAMMIT >:(`);
+      message.channel.send(
+        `<@${message.author.id}> GIMME SUBREDDIT NAME DAMMIT >:(`
+      );
       return;
     }
 
