@@ -1,5 +1,6 @@
 const fetch = require("node-fetch");
 const snoowrap = require("snoowrap");
+const helper = require("../shared/helper.js");
 
 const r = new snoowrap({
   userAgent: process.env.REDDIT_USER_AGENT,
@@ -89,29 +90,32 @@ errorMsg = (message, user) => {
 };
 
 getImage = async (message, args) => {
-  if (args[0] === "help") {
-    let user = message.author.id;
+  let user = message.author.id;
 
-    await message.channel.send(`<@${user}>`, {
-      embed: {
-        title: `!r`,
-        description: `Gets random image from given subreddit's hot or top page`,
-        fields: [
-          {
-            name: `Usage:`,
-            value: `!r [**subreddit_name**] [**hot**/top] [**all**/hour/day/week/month/year]`
-          },
-          {
-            name: `Optional parameters:`,
-            value: `[hot/top] [all/hour/day/week/month/year]`
-          },
-          {
-            name: `Examples:`,
-            value: `!r zettairyouiki || !r zettairyouiki hot || !r zettairyouiki top all`
-          }
-        ]
-      }
-    });
+  if (args[0] === "help") {
+    const helpData = {
+      title: `!r`,
+      description: `Gets random image from given subreddit's hot or top page\nNote: pass time options only when getting images from "top"`,
+      fields: [
+        {
+          name: `Usage:`,
+          value: `!r [**subreddit_name**] [**hot**/top] [**all**/hour/day/week/month/year]`
+        },
+        {
+          name: `Optional parameters:`,
+          value: `[hot/top] [all/hour/day/week/month/year]`
+        },
+        {
+          name: `Examples:`,
+          value: `!r zettairyouiki || !r zettairyouiki hot || !r zettairyouiki top all`
+        },
+        {
+          name: `**Important:**`,
+          value: `Remember that passed name must point to existing (and non-empty) subreddit!`
+        }
+      ]
+    };
+    await helper.getHelp(message, user, helpData);
   } else {
     let data = {
       subreddit: args[0],
@@ -120,9 +124,7 @@ getImage = async (message, args) => {
     };
 
     if (data.subreddit === undefined || data.subreddit === "") {
-      message.channel.send(
-        `<@${message.author.id}> GIMME SUBREDDIT NAME DAMMIT >:(`
-      );
+      message.channel.send(`<@${user}> GIMME SUBREDDIT NAME DAMMIT >:(`);
       return;
     }
 
