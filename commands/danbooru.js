@@ -1,23 +1,32 @@
 const Danbooru = require("danbooru");
+const helper = require("../shared/helper.js");
 
-// Perform a search for popular image posts
-const booru = new Danbooru(process.env.DANBOORU_LOGIN + ":" + process.env.DANBOORU_KEY);
+const booru = new Danbooru(
+  process.env.DANBOORU_LOGIN + ":" + process.env.DANBOORU_KEY
+);
 
 getMomo = async (message, args) => {
+  let user = message.author.id;
   if (args[0] === "help") {
-    let user = message.author.id;
-
-    await message.channel.send(`<@${user}>`, {
-      embed: {
-        title: `!momo`,
-        description: `Gets random Momo image from danbooru`,
-        fields: [
-          { name: `Usage:`, value: `!momo [nsfw]` },
-          { name: `Optional parameters:`, value: `[nsfw]` },
-          { name: `Examples:`, value: `!momo || !momo nsfw` }
-        ]
-      }
-    });
+    const helpData = {
+      title: `!momo`,
+      description: `Gets random Momo image from danbooru`,
+      fields: [
+        {
+          name: `Usage:`,
+          value: `!momo [nsfw]`
+        },
+        {
+          name: `Optional parameters:`,
+          value: `[nsfw]`
+        },
+        {
+          name: `Examples:`,
+          value: `!momo || !momo nsfw`
+        }
+      ]
+    };
+    await helper.getHelp(message, user, helpData);
   } else {
     let user = message.author.id;
     let nsfw = args[0] === "nsfw" ? true : false;
@@ -55,17 +64,29 @@ getImage = async (message, args) => {
   let user = message.author.id;
 
   if (args[0] === "help") {
-    await message.channel.send(`<@${user}>`, {
-      embed: {
-        title: `!danbooru`,
-        description: `Gets random image from danbooru with given tags\nNote: passing no tags will select completely random image from first page`,
-        fields: [
-          { name: `Usage:`, value: `!danbooru [tags]` },
-          { name: `Optional parameters:`, value: `[tags]` },
-          { name: `Examples:`, value: `!danbooru || !danbooru kiana_kaslana` }
-        ]
-      }
-    });
+    const helpData = {
+      title: `!danbooru`,
+      description: `Gets random image from danbooru with given tags (max. **2**)\nNote: passing no tags will select completely random image from the first page`,
+      fields: [
+        {
+          name: `Usage:`,
+          value: `!danbooru [tags]`
+        },
+        {
+          name: `Optional parameters:`,
+          value: `[tags]`
+        },
+        {
+          name: `Examples:`,
+          value: `!danbooru || !danbooru kiana_kaslana`
+        },
+        {
+          name: `**Important:**`,
+          value: `Remember that passed tag must be a **valid** danbooru tag!`
+        }
+      ]
+    };
+    await helper.getHelp(message, user, helpData);
   } else {
     if (args.length > 2) {
       await message.channel.send(`<@${user}> you gave me too much tags uwu`);
