@@ -1,5 +1,6 @@
 const fetch = require("node-fetch");
 const snoowrap = require("snoowrap");
+const helper = require("../shared/helper.js");
 
 const r = new snoowrap({
   userAgent: process.env.REDDIT_USER_AGENT,
@@ -11,8 +12,6 @@ const r = new snoowrap({
 const time = ["all", "hour", "day", "week", "month", "year"];
 
 getHotImage = (message, data) => {
-  let user = message.author.id;
-
   try {
     r.getSubreddit(data.subreddit)
       .getHot()
@@ -24,19 +23,19 @@ getHotImage = (message, data) => {
       .filter(submission => submission.stickied !== true)
       .filter(submission => submission.thumbnail !== "self")
       .then(submissions => {
-        let post =
-          submissions[Math.floor(Math.random() * submissions.length)].link;
-        message.channel.send(
-          `<@${user}> here's random hot image from r/${
-            data.subreddit
-          } for you! owo\n${post}`
-        );
+        let post = submissions[Math.floor(Math.random() * submissions.length)];
+        let imgData = {
+          title: `Here's random image from r/${data.subreddit} for you! owo`,
+          description: `[Full image](${post.link})`,
+          url: post.link
+        };
+        helper.sendImage(message.channel, message.author.id, imgData);
       })
       .catch(() => {
-        errorMsg(message, user);
+        errorMsg(message.channel, message.author.id);
       });
   } catch (error) {
-    errorMsg(message, user);
+    errorMsg(message.channel, message.author.id);
   }
 };
 
@@ -46,11 +45,12 @@ checkTimeRangeOption = option => {
 
 getTopImage = (message, data) => {
   let time = data.timeOptions || "all";
-  let user = message.author.id;
 
   if (!checkTimeRangeOption(data.timeOptions)) {
     message.channel.send(
-      `<@${user}> you passed wrong time range option, correct ones are: all, hour, day, week, month, year`
+      `<@${
+        message.author.id
+      }> you passed wrong time range option, correct ones are: all, hour, day, week, month, year`
     );
     return;
   }
@@ -66,52 +66,55 @@ getTopImage = (message, data) => {
       .filter(submission => submission.stickied !== true)
       .filter(submission => submission.thumbnail !== "self")
       .then(submissions => {
-        let post =
-          submissions[Math.floor(Math.random() * submissions.length)].link;
-        message.channel.send(
-          `<@${user}> here's random top image (range: ${time}) from r/${
+        let post = submissions[Math.floor(Math.random() * submissions.length)];
+        let imgData = {
+          title: `Here's random top image (range: ${time}) from r/${
             data.subreddit
-          } for you! owo\n${post}`
-        );
+          } for you! owo`,
+          description: `[Full image](${post.link})`,
+          url: post.link
+        };
+        helper.sendImage(message.channel, message.author.id, imgData);
       })
       .catch(() => {
-        errorMsg(message, user);
+        errorMsg(message.channel, message.author.id);
       });
   } catch (error) {
-    errorMsg(message, user);
+    errorMsg(message.channel, message.author.id);
   }
 };
 
-errorMsg = (message, user) => {
-  message.channel.send(
-    `<@${user}> something went wrong, maybe wrong subreddit name? uwu`
+errorMsg = async (channel, user) => {
+  await channel.send(
+    `<@${user}> something went wrong, maybe invalid subreddit name? uwu`
   );
 };
 
 getImage = async (message, args) => {
   if (args[0] === "help") {
-    let user = message.author.id;
-
-    await message.channel.send(`<@${user}>`, {
-      embed: {
-        title: `!r`,
-        description: `Gets random image from given subreddit's hot or top page`,
-        fields: [
-          {
-            name: `Usage:`,
-            value: `!r [**subreddit_name**] [**hot**/top] [**all**/hour/day/week/month/year]`
-          },
-          {
-            name: `Optional parameters:`,
-            value: `[hot/top] [all/hour/day/week/month/year]`
-          },
-          {
-            name: `Examples:`,
-            value: `!r zettairyouiki || !r zettairyouiki hot || !r zettairyouiki top all`
-          }
-        ]
-      }
-    });
+    const helpData = {
+      title: `!r`,
+      description: `Gets random image from given subreddit's hot or top page\n**Note:** use time option only when getting images from top`,
+      fields: [
+        {
+          name: `Usage:`,
+          value: `!r [**subreddit_name**] [**hot**/top] [**all**/hour/day/week/month/year]`
+        },
+        {
+          name: `Optional parameters:`,
+          value: `[hot/top] [all/hour/day/week/month/year]`
+        },
+        {
+          name: `Examples:`,
+          value: `!r zettairyouiki || !r zettairyouiki hot || !r zettairyouiki top all`
+        },
+        {
+          name: `**Important:**`,
+          value: `Remember that passed name must point to existing (and non-empty) subreddit!`
+        }
+      ]
+    };
+    await helper.getHelp(message.channel, message.author.id, helpData);
   } else {
     let data = {
       subreddit: args[0],
