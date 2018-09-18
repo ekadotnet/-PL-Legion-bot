@@ -8,6 +8,19 @@ getHelp = async (message, user, data) => {
   });
 };
 
+sendImage = async (channel, user, data) => {
+  await channel.send(`<@${user}>`, {
+    embed: {
+      title: data.title,
+      description: data.description,
+      image: {
+        url: data.url
+      }
+    }
+  });
+};
+
 module.exports = {
-  getHelp: getHelp
+  getHelp: getHelp,
+  sendImage: sendImage
 };
