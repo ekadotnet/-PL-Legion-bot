@@ -94,7 +94,7 @@ say = async (message, args) => {
     await helper.getHelp(message, user, helpData);
   } else {
     const say = args.join(" ");
-    message.delete().catch(O_o => {});
+    message.delete().catch(error => console.log(error));
     if (say === "" || say === null) {
       await message.channel.send(`What am I supposed to say? >:(`);
     } else {
