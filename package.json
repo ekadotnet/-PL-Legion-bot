@@ -1,14 +1,26 @@
 {
-  "name": "boop",
+  "name": "pl_legion_bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple bot for [PL] Legion armada",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "engines": {
+    "node": "8.x",
+    "npm": "*"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EnjoyTheNoise/-PL-Legion-bot.git"
+  },
+  "keywords": [
+    "heroku",
+    "discord.js"
+  ],
+  "author": "EnjoyTheNoise#2702",
+  "license": "MIT",
   "dependencies": {
     "danbooru": "^3.0.8",
     "discord.js": "^11.4.2",
@@ -17,5 +29,9 @@
     "snoowrap": "^1.15.2",
     "uuid": "^3.3.2",
     "weeb-sh": "^0.3.3"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/EnjoyTheNoise/-PL-Legion-bot/issues"
+  },
+  "homepage": "https://github.com/EnjoyTheNoise/-PL-Legion-bot#readme"
 }
