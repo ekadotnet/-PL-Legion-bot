@@ -24,6 +24,16 @@ getHotImage = (message, data) => {
       .filter(submission => submission.thumbnail !== "self")
       .then(submissions => {
         let post = submissions[Math.floor(Math.random() * submissions.length)];
+        if (post.link.includes("imgur")) {
+          if (
+            !post.link.endsWith("png") ||
+            !post.link.endsWith("png") ||
+            !post.link.endsWith("jpeg")
+          ) {
+            post.link += ".png";
+          }
+        }
+
         let imgData = {
           title: `Here's random image from r/${data.subreddit} for you! owo`,
           description: `[Full image](${post.link})`,
@@ -67,6 +77,16 @@ getTopImage = (message, data) => {
       .filter(submission => submission.thumbnail !== "self")
       .then(submissions => {
         let post = submissions[Math.floor(Math.random() * submissions.length)];
+        if (post.link.includes("imgur")) {
+          if (
+            !post.link.endsWith("png") ||
+            !post.link.endsWith("png") ||
+            !post.link.endsWith("jpeg")
+          ) {
+            post.link += ".png";
+          }
+        }
+
         let imgData = {
           title: `Here's random top image (range: ${time}) from r/${
             data.subreddit
