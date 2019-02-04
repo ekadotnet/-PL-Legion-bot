@@ -1,5 +1,11 @@
 const snoowrap = require("snoowrap");
 const sender = require("../shared/sender.js");
+const {
+  commandTypes,
+  errorTypes,
+  time,
+  redditDescription
+} = require("./constants.js");
 
 const r = new snoowrap({
   userAgent: process.env.REDDIT_USER_AGENT,
@@ -8,64 +14,28 @@ const r = new snoowrap({
   refreshToken: process.env.REDDIT_REFRESH_TOKEN
 });
 
-const commandTypes = {
-  NOT_PASSED: "",
-  HOT: "hot",
-  TOP: "top"
-};
-
-const errorTypes = {
-  DEFAULT: 0,
-  TIME_OPTION: 1,
-  WRONG_PARAMETER: 2,
-  NO_SUBREDDIT: 3
-};
-
-const time = ["all", "hour", "day", "week", "month", "year"];
-
-const defaultTimeOption = "all";
-
-const redditDescription = {
-  title: `!r`,
-  description: `Gets random image from given subreddit's hot or top page\n**Note:** use time option only when getting images from top`,
-  fields: [
-    {
-      name: `Usage:`,
-      value: `!r [**subreddit_name**] [**hot**/top] [**all**/hour/day/week/month/year]`
-    },
-    {
-      name: `Optional parameters:`,
-      value: `[hot/top] [all/hour/day/week/month/year]`
-    },
-    {
-      name: `Examples:`,
-      value: `!r zettairyouiki || !r zettairyouiki hot || !r zettairyouiki top all`
-    },
-    {
-      name: `**Important:**`,
-      value: `Remember that passed name must point to existing (and non-empty) subreddit!`
-    }
-  ]
-};
-
 const sendErrorMessage = async (channel, user, errorType) => {
   switch (errorType) {
     case errorTypes.TIME_OPTION: {
       let message = `<@${user}> you passed wrong time range option, correct ones are: all, hour, day, week, month, year`;
       await sender.sendMessage(channel, message);
+      break;
     }
     case errorTypes.WRONG_PARAMETER: {
       let message = `<@${user}> gave me wrong parameters uwu`;
       await sender.sendMessage(channel, message);
+      break;
     }
     case errorTypes.NO_SUBREDDIT: {
       let message = `<@${user}> GIMME SUBREDDIT NAME DAMMIT >:(`;
       await sender.sendMessage(channel, message);
+      break;
     }
     case errorTypes.DEFAULT:
     default: {
       let message = `<@${user}> something went wrong, maybe invalid subreddit name? uwu`;
       await sender.sendMessage(channel, message);
+      break;
     }
   }
 };
@@ -125,9 +95,9 @@ const getHotImage = async (message, data) => {
 };
 
 const getTopImage = async (message, data) => {
-  let time = data.timeOptions || defaultTimeOption;
+  let time = data.timeOptions || "all";
 
-  if (!checkTimeRangeOption(data.timeOptions)) {
+  if (!checkTimeRangeOption(time)) {
     await sendErrorMessage(
       message.channel,
       message.author.id,
@@ -147,11 +117,11 @@ const getTopImage = async (message, data) => {
       }))
       .filter(submission => submission.stickied !== true)
       .filter(submission => submission.thumbnail !== submissionThumbnail)
-      .then(submissions => {
+      .then(async submissions => {
         let post = submissions[Math.floor(Math.random() * submissions.length)];
-        let imgData = formatImageData(time, data.subreddit, post.link);
+        let imgData = formatImageData(data.subreddit, post.link, time);
 
-        sender.sendImage(message.channel, message.author.id, imgData);
+        await sender.sendImage(message.channel, message.author.id, imgData);
       })
       .catch(
         async () =>
