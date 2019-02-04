@@ -20,7 +20,12 @@ sendImage = async (channel, user, data) => {
   });
 };
 
+sendMessage = async (channel, message) => {
+  await channel.send(message);
+};
+
 module.exports = {
   getHelp: getHelp,
-  sendImage: sendImage
+  sendImage: sendImage,
+  sendMessage: sendMessage
 };
