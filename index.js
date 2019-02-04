@@ -5,6 +5,18 @@ const boop = require("./commands/boop.js");
 const utils = require("./commands/utils.js");
 const reddit = require("./commands/reddit.js");
 const danbooru = require("./commands/danbooru.js");
+const sender = require("./shared/sender.js");
+
+const commands = {
+  PING: "ping",
+  ME: "me",
+  BOOP: "boop",
+  R: "r",
+  MOMO: "momo",
+  DANBOORU: "danbooru",
+  COMMANDS: "commands",
+  HELP: "help"
+};
 
 client.on("ready", () => {
   console.log(
@@ -45,43 +57,39 @@ client.on("message", async message => {
   const command = args.shift().toLowerCase();
 
   switch (command) {
-    case "ping": {
+    case commands.PING: {
       await utils.ping(message, args, client);
       break;
     }
-    case "me": {
+    case commands.ME: {
       await utils.me(message, args);
       break;
     }
-    case "say": {
-      await utils.say(message, args);
-      break;
-    }
-    case "boop": {
+    case commands.BOOP: {
       await boop.execute(message, args);
       break;
     }
-    case "r": {
+    case commands.R: {
       await reddit.getImage(message, args);
       break;
     }
-    case "momo": {
+    case commands.DANBOORU: {
       await danbooru.getMomo(message, args);
       break;
     }
-    case "danbooru": {
+    case commands.DANBOORU: {
       await danbooru.getImage(message, args);
       break;
     }
-    case "commands":
-    case "help": {
+    case commands.COMMANDS:
+    case commands.HELP: {
       await utils.help(message, args);
       break;
     }
-    default:
-      await message.channel.send(
-        `Unknown command !${command}. Try !help or !commands to get more info.`
-      );
+    default: {
+      let msg = `Unknown command !${command}. Try !help or !commands to get more info.`;
+      await sender.sendMessage(message.chanel, msg);
+    }
   }
 });
 
