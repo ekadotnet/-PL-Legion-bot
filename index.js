@@ -1,16 +1,14 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
-const boop = require("./commands/boop.js");
-const utils = require("./commands/utils.js");
-const reddit = require("./commands/reddit.js");
-const danbooru = require("./commands/danbooru.js");
-const sender = require("./shared/sender.js");
+const utils = require("./commands/utils/utils.js");
+const reddit = require("./commands/reddit/reddit.js");
+const danbooru = require("./commands/danbooru/danbooru.js");
+const sender = require("./commands/shared/sender.js");
 
 const commands = {
   PING: "ping",
   ME: "me",
-  BOOP: "boop",
   R: "r",
   MOMO: "momo",
   DANBOORU: "danbooru",
@@ -24,8 +22,7 @@ client.on("ready", () => {
       client.channels.size
     } channels of ${client.guilds.size} guilds.`
   );
-  //client.user.setActivity(`Serving ${client.guilds.size} servers`);
-  client.user.setActivity(`Annoying Boopers`);
+  client.user.setActivity(`Serving ${client.guilds.size} servers`);
 });
 
 client.on("guildCreate", guild => {
@@ -65,15 +62,11 @@ client.on("message", async message => {
       await utils.me(message, args);
       break;
     }
-    case commands.BOOP: {
-      await boop.execute(message, args);
-      break;
-    }
     case commands.R: {
       await reddit.getImage(message, args);
       break;
     }
-    case commands.DANBOORU: {
+    case commands.MOMO: {
       await danbooru.getMomo(message, args);
       break;
     }
@@ -87,8 +80,8 @@ client.on("message", async message => {
       break;
     }
     default: {
-      let msg = `Unknown command !${command}. Try !help or !commands to get more info.`;
-      await sender.sendMessage(message.chanel, msg);
+      let msg = `<@${message.author.id}> Unknown command !${command}. Try !help or !commands to get more info.`;
+      await sender.sendMessage(message.channel, msg);
     }
   }
 });
