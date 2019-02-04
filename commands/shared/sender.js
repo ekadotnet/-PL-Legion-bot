@@ -1,4 +1,4 @@
-getHelp = async (channel, user, data) => {
+const getHelp = async (channel, user, data) => {
   await channel.send(`<@${user}>`, {
     embed: {
       title: data.title,
@@ -8,7 +8,7 @@ getHelp = async (channel, user, data) => {
   });
 };
 
-sendImage = async (channel, user, data) => {
+const sendImage = async (channel, user, data) => {
   await channel.send(`<@${user}>`, {
     embed: {
       title: data.title,
@@ -20,7 +20,12 @@ sendImage = async (channel, user, data) => {
   });
 };
 
+const sendMessage = async (channel, message) => {
+  return await channel.send(message);
+};
+
 module.exports = {
   getHelp: getHelp,
-  sendImage: sendImage
+  sendImage: sendImage,
+  sendMessage: sendMessage
 };

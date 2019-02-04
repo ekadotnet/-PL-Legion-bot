@@ -1,10 +1,20 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
-const boop = require("./commands/boop.js");
-const utils = require("./commands/utils.js");
-const reddit = require("./commands/reddit.js");
-const danbooru = require("./commands/danbooru.js");
+const utils = require("./commands/utils/utils.js");
+const reddit = require("./commands/reddit/reddit.js");
+const danbooru = require("./commands/danbooru/danbooru.js");
+const sender = require("./commands/shared/sender.js");
+
+const commands = {
+  PING: "ping",
+  ME: "me",
+  R: "r",
+  MOMO: "momo",
+  DANBOORU: "danbooru",
+  COMMANDS: "commands",
+  HELP: "help"
+};
 
 client.on("ready", () => {
   console.log(
@@ -12,8 +22,7 @@ client.on("ready", () => {
       client.channels.size
     } channels of ${client.guilds.size} guilds.`
   );
-  //client.user.setActivity(`Serving ${client.guilds.size} servers`);
-  client.user.setActivity(`Annoying Boopers`);
+  client.user.setActivity(`Serving ${client.guilds.size} servers`);
 });
 
 client.on("guildCreate", guild => {
@@ -45,43 +54,35 @@ client.on("message", async message => {
   const command = args.shift().toLowerCase();
 
   switch (command) {
-    case "ping": {
+    case commands.PING: {
       await utils.ping(message, args, client);
       break;
     }
-    case "me": {
+    case commands.ME: {
       await utils.me(message, args);
       break;
     }
-    case "say": {
-      await utils.say(message, args);
-      break;
-    }
-    case "boop": {
-      await boop.execute(message, args);
-      break;
-    }
-    case "r": {
+    case commands.R: {
       await reddit.getImage(message, args);
       break;
     }
-    case "momo": {
+    case commands.MOMO: {
       await danbooru.getMomo(message, args);
       break;
     }
-    case "danbooru": {
+    case commands.DANBOORU: {
       await danbooru.getImage(message, args);
       break;
     }
-    case "commands":
-    case "help": {
+    case commands.COMMANDS:
+    case commands.HELP: {
       await utils.help(message, args);
       break;
     }
-    default:
-      await message.channel.send(
-        `Unknown command !${command}. Try !help or !commands to get more info.`
-      );
+    default: {
+      let msg = `<@${message.author.id}> Unknown command !${command}. Try !help or !commands to get more info.`;
+      await sender.sendMessage(message.channel, msg);
+    }
   }
 });
 
