@@ -1,82 +1,41 @@
 const Danbooru = require("danbooru");
 const sender = require("../shared/sender.js");
+const {
+  errorTypes,
+  momoNsfwTags,
+  momoTags,
+  momoDescription,
+  danbooruDescription
+} = require("./constants.js");
 
 const booru = new Danbooru(
   process.env.DANBOORU_LOGIN + ":" + process.env.DANBOORU_KEY
 );
-
-const errorTypes = {
-  DEFAULT: 0,
-  TOO_MUCH_TAGS: 1,
-  NO_RESULTS: 2
-};
-
-const momoDescription = {
-  title: `!momo`,
-  description: `Gets random Momo image from danbooru`,
-  fields: [
-    {
-      name: `Usage:`,
-      value: `!momo [nsfw]`
-    },
-    {
-      name: `Optional parameters:`,
-      value: `[nsfw]`
-    },
-    {
-      name: `Examples:`,
-      value: `!momo || !momo nsfw`
-    }
-  ]
-};
-
-const momoTags = "rating:safe momo_velia_deviluke";
-const momoNsfwTags = "rating:questionable momo_velia_deviluke";
-
-const danbooruDescription = {
-  title: `!danbooru`,
-  description: `Gets random image from danbooru with given tag(s) (max. **2**)\n**Note:** passing no tags will select completely random image from the first page`,
-  fields: [
-    {
-      name: `Usage:`,
-      value: `!danbooru [tags]`
-    },
-    {
-      name: `Optional parameters:`,
-      value: `[tags]`
-    },
-    {
-      name: `Examples:`,
-      value: `!danbooru || !danbooru kiana_kaslana`
-    },
-    {
-      name: `**Important:**`,
-      value: `Remember that passed tag(s) must be a **valid** danbooru tag!`
-    }
-  ]
-};
 
 const sendErrorMessage = async (channel, user, errorType) => {
   switch (errorType) {
     case errorTypes.TOO_MUCH_TAGS: {
       let message = `<@${user}> you gave me too much tags uwu`;
       sender.sendMessage(channel, message);
+      break;
     }
     case errorTypes.NO_RESULTS: {
       let message = `<@${user}> I found 0 images with given tag(s), are you sure they're correct?`;
       sender.sendMessage(channel, message);
+      break;
     }
     case errorTypes.DEFAULT:
     default: {
       let message = `<@${user}> Something went wrong, sowwy`;
       sender.sendMessage(channel, message);
+      break;
     }
   }
 };
 
 const formatMomoImage = (isNsfw, fileUrl, largeFileUrl) => {
   return {
-    title: `<Here's random ${
+    title: `Here's random ${
       isNsfw ? "and (probably) nsfw " : ""
     }Momo image for you! owo`,
     description: `[Full image](${booru.url(fileUrl)})`,
@@ -96,7 +55,7 @@ const formatImage = (tags, fileUrl, LargeFileUrl) => {
 };
 
 const getRandomPost = posts => {
-  return posts[Math.random() * posts.length];
+  return posts[Math.floor(Math.random() * posts.length)];
 };
 
 const getMomo = async (message, args) => {
