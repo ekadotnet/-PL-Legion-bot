@@ -5,6 +5,7 @@ const boop = require("./commands/boop.js");
 const utils = require("./commands/utils.js");
 const reddit = require("./commands/reddit.js");
 const danbooru = require("./commands/danbooru.js");
+const timers = require("./timers/timers.js");
 
 client.on("ready", () => {
   console.log(
@@ -73,6 +74,10 @@ client.on("message", async message => {
       await danbooru.getImage(message, args);
       break;
     }
+    case "timers":{
+      timers.handleCommand(message, args, Discord.Permissions)
+      break;
+    }
     case "commands":
     case "help": {
       await utils.help(message, args);
@@ -85,4 +90,4 @@ client.on("message", async message => {
   }
 });
 
-client.login(process.env.TOKEN);
+client.login(process.env.DEV_TOKEN);
