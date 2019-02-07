@@ -14,7 +14,8 @@ const commands = {
   MOMO: "momo",
   DANBOORU: "danbooru",
   COMMANDS: "commands",
-  HELP: "help"
+  HELP: "help",
+  TIMERS: "timers"
 };
 
 client.on("ready", () => {
@@ -75,13 +76,19 @@ client.on("message", async message => {
       await danbooru.getImage(message, args);
       break;
     }
-    case "commands":
-    case "help": {
+    case commands.TIMERS: {
+      timers.handleCommand(message, args, Discord.Permissions);
+      break;
+    }
+    case commands.COMMANDS:
+    case commands.HELP: {
       await utils.help(message, args);
       break;
     }
     default: {
-      let msg = `<@${message.author.id}> Unknown command !${command}. Try !help or !commands to get more info.`;
+      let msg = `<@${
+        message.author.id
+      }> Unknown command !${command}. Try !help or !commands to get more info.`;
       await sender.sendMessage(message.channel, msg);
     }
   }
