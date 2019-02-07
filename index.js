@@ -77,6 +77,11 @@ client.on("message", async message => {
       break;
     }
     case commands.TIMERS: {
+      if (
+        !message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)
+      ) {
+        return;
+      }
       timers.handleCommand(message, args, Discord.Permissions);
       break;
     }
