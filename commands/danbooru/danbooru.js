@@ -90,7 +90,8 @@ const getImage = async (message, args) => {
     if (args.length > 2) {
       await sendErrorMessage(
         message.channel,
-        message.author.id.errorTypes.TOO_MUCH_TAGS
+        message.author.id,
+        errorTypes.TOO_MUCH_TAGS
       );
       return;
     }
@@ -105,7 +106,8 @@ const getImage = async (message, args) => {
         if (posts.length === 0) {
           await sendErrorMessage(
             message.channel,
-            message.author.id.errorTypes.NO_RESULTS
+            message.author.id,
+            errorTypes.NO_RESULTS
           );
           return;
         }
