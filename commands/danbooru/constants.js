@@ -7,12 +7,12 @@ module.exports = {
   momoTags: "rating:safe momo_velia_deviluke",
   momoNsfwTags: "rating:questionable momo_velia_deviluke",
   momoDescription: {
-    title: `!momo`,
+    title: `\`momo`,
     description: `Gets random Momo image from danbooru`,
     fields: [
       {
         name: `Usage:`,
-        value: `!momo [nsfw]`
+        value: `\`momo [nsfw]`
       },
       {
         name: `Optional parameters:`,
@@ -20,17 +20,17 @@ module.exports = {
       },
       {
         name: `Examples:`,
-        value: `!momo || !momo nsfw`
+        value: `momo | momo nsfw`
       }
     ]
   },
   danbooruDescription: {
-    title: `!danbooru`,
+    title: `\`danbooru`,
     description: `Gets random image from danbooru with given tag(s) (max. **2**)\n**Note:** passing no tags will select completely random image from the first page`,
     fields: [
       {
         name: `Usage:`,
-        value: `!danbooru [tags]`
+        value: `\`danbooru [tags]`
       },
       {
         name: `Optional parameters:`,
@@ -38,7 +38,7 @@ module.exports = {
       },
       {
         name: `Examples:`,
-        value: `!danbooru || !danbooru kiana_kaslana`
+        value: `danbooru | danbooru kiana_kaslana`
       },
       {
         name: `**Important:**`,
