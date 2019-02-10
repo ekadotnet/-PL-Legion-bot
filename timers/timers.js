@@ -29,7 +29,7 @@ const init = (message, permissions) => {
 
   return server.createChannel("Abyss", "category").then(category => {
     server
-      .createChannel("Abyss", "text", [
+      .createChannel("Abyss", "voice", [
         {
           id: server.id,
           denied: permissions.ALL
@@ -39,7 +39,7 @@ const init = (message, permissions) => {
         channel.setParent(category).then(() => {
           server.createChannel("Open World", "category").then(category => {
             server
-              .createChannel("Round", "text", [
+              .createChannel("Round", "voice", [
                 {
                   id: server.id,
                   denied: permissions.ALL
@@ -75,7 +75,7 @@ const start = message => {
     } else {
       clearInterval(interval);
     }
-  }, 3000);
+  }, REFRESH_RATE);
 };
 
 const stop = () => {
