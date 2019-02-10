@@ -24,7 +24,7 @@ client.on("ready", () => {
       client.channels.size
     } channels of ${client.guilds.size} guilds.`
   );
-  client.user.setActivity(`Serving ${client.guilds.size} servers`);
+  client.user.setActivity(`Thighs save lives`);
 });
 
 client.on("guildCreate", guild => {
@@ -33,12 +33,12 @@ client.on("guildCreate", guild => {
       guild.memberCount
     } members!`
   );
-  client.user.setActivity(`Serving ${client.guilds.size} servers`);
+  client.user.setActivity(`Thighs save lives`);
 });
 
 client.on("guildDelete", guild => {
   console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
-  client.user.setActivity(`Serving ${client.guilds.size} servers`);
+  client.user.setActivity(`Thighs save lives`);
 });
 
 client.on("error", error => {
@@ -77,12 +77,7 @@ client.on("message", async message => {
       break;
     }
     case commands.TIMERS: {
-      if (
-        !message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)
-      ) {
-        return;
-      }
-      timers.handleCommand(message, args, Discord.Permissions);
+      await timers.handleCommand(message, args, Discord.Permissions);
       break;
     }
     case commands.COMMANDS:
