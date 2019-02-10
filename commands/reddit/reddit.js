@@ -73,6 +73,17 @@ const getHotImage = async (message, data) => {
       .filter(submission => submission.thumbnail !== submissionThumbnail)
       .then(async submissions => {
         let post = submissions[Math.floor(Math.random() * submissions.length)];
+
+        if (post.link.includes("imgur")) {
+          if (
+            !post.link.endsWith("png") ||
+            !post.link.endsWith("png") ||
+            !post.link.endsWith("jpeg")
+          ) {
+            post.link += ".png";
+          }
+        }
+
         let imgData = formatImageData(data.subreddit, post.link);
 
         await sender.sendImage(message.channel, message.author.id, imgData);
@@ -119,6 +130,17 @@ const getTopImage = async (message, data) => {
       .filter(submission => submission.thumbnail !== submissionThumbnail)
       .then(async submissions => {
         let post = submissions[Math.floor(Math.random() * submissions.length)];
+
+        if (post.link.includes("imgur")) {
+          if (
+            !post.link.endsWith("png") ||
+            !post.link.endsWith("png") ||
+            !post.link.endsWith("jpeg")
+          ) {
+            post.link += ".png";
+          }
+        }
+
         let imgData = formatImageData(data.subreddit, post.link, time);
 
         await sender.sendImage(message.channel, message.author.id, imgData);

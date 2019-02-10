@@ -5,6 +5,7 @@ const utils = require("./commands/utils/utils.js");
 const reddit = require("./commands/reddit/reddit.js");
 const danbooru = require("./commands/danbooru/danbooru.js");
 const sender = require("./commands/shared/sender.js");
+const timers = require("./timers/timers.js");
 
 const commands = {
   PING: "ping",
@@ -13,7 +14,8 @@ const commands = {
   MOMO: "momo",
   DANBOORU: "danbooru",
   COMMANDS: "commands",
-  HELP: "help"
+  HELP: "help",
+  TIMERS: "timers"
 };
 
 client.on("ready", () => {
@@ -22,7 +24,7 @@ client.on("ready", () => {
       client.channels.size
     } channels of ${client.guilds.size} guilds.`
   );
-  client.user.setActivity(`Serving ${client.guilds.size} servers`);
+  client.user.setActivity(`Thighs save lives`);
 });
 
 client.on("guildCreate", guild => {
@@ -31,12 +33,12 @@ client.on("guildCreate", guild => {
       guild.memberCount
     } members!`
   );
-  client.user.setActivity(`Serving ${client.guilds.size} servers`);
+  client.user.setActivity(`Thighs save lives`);
 });
 
 client.on("guildDelete", guild => {
   console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
-  client.user.setActivity(`Serving ${client.guilds.size} servers`);
+  client.user.setActivity(`Thighs save lives`);
 });
 
 client.on("error", error => {
@@ -74,16 +76,22 @@ client.on("message", async message => {
       await danbooru.getImage(message, args);
       break;
     }
+    case commands.TIMERS: {
+      await timers.handleCommand(message, args, Discord.Permissions);
+      break;
+    }
     case commands.COMMANDS:
     case commands.HELP: {
       await utils.help(message, args);
       break;
     }
     default: {
-      let msg = `<@${message.author.id}> Unknown command !${command}. Try !help or !commands to get more info.`;
+      let msg = `<@${
+        message.author.id
+      }> Unknown command !${command}. Try !help or !commands to get more info.`;
       await sender.sendMessage(message.channel, msg);
     }
   }
 });
 
-client.login(process.env.TOKEN);
+client.login(process.env.DEV_TOKEN);

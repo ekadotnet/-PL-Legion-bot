@@ -12,12 +12,12 @@ module.exports = {
   },
   time: ["all", "hour", "day", "week", "month", "year"],
   redditDescription: {
-    title: `!r`,
+    title: `\`r`,
     description: `Gets random image from given subreddit's hot or top page\n**Note:** use time option only when getting images from top`,
     fields: [
       {
         name: `Usage:`,
-        value: `!r [**subreddit_name**] [**hot**/top] [**all**/hour/day/week/month/year]`
+        value: `\`r [**subreddit_name**] [**hot**/top] [**all**/hour/day/week/month/year]`
       },
       {
         name: `Optional parameters:`,
@@ -25,7 +25,7 @@ module.exports = {
       },
       {
         name: `Examples:`,
-        value: `!r zettairyouiki | !r zettairyouiki hot | !r zettairyouiki top all`
+        value: `r zettairyouiki | r zettairyouiki hot | r zettairyouiki top all`
       },
       {
         name: `**Important:**`,

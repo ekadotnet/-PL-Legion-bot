@@ -5,7 +5,7 @@ module.exports = {
     fields: [
       {
         name: `Usage:`,
-        value: `!ping`
+        value: `\`ping`
       },
       {
         name: `Optional Parameters:`,
@@ -13,17 +13,17 @@ module.exports = {
       },
       {
         name: `Examples:`,
-        value: `!ping`
+        value: `ping`
       }
     ]
   },
   meDescription: {
-    title: `!me`,
+    title: `\`me`,
     description: `Displays activity given by user`,
     fields: [
       {
         name: `Usage:`,
-        value: `!me [activity]`
+        value: `\`me [activity]`
       },
       {
         name: `Optional Parameters:`,
@@ -31,7 +31,7 @@ module.exports = {
       },
       {
         name: `Examples:`,
-        value: `!me watching anime`
+        value: `me watching anime`
       }
     ]
   },
@@ -41,10 +41,14 @@ module.exports = {
     fields: [
       {
         name: `Available commands:`,
-        value: `**!ping !me !boop !r !momo !danbooru !commands !help**\nTo get more specific info:\n**!command help** (for example: **!r help**)`
+        value: `**ping | me | boop | r | momo | danbooru | commands | help**\nTo get more specific info:\n**\`command help** (for example: **\`r help**)`
       },
+      { name: `Admin commands:`, value: `**timers**` },
       { name: `Author:`, value: `EnjoyTheNoise#2702` },
-      { name: `Repository:`, value: `[GitHub](https://github.com/EnjoyTheNoise/-PL-Legion-bot)`}
+      {
+        name: `Repository:`,
+        value: `[GitHub](https://github.com/EnjoyTheNoise/-PL-Legion-bot)`
+      }
     ]
   }
 };
