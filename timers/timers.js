@@ -164,7 +164,7 @@ const getDuration = (now, dayOfWeek, offset, minutesOffset = 0) => {
   let difference = then.diff(now);
   let duration = moment.duration(difference);
   let remaining =
-    Math.floor(duration.asHours()) + moment.utc(difference).format(":mm");
+    Math.floor(duration.asHours()) + moment(difference).format(":mm");
 
   let dateParts = remaining.split(":");
 
