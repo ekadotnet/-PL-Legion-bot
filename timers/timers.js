@@ -22,13 +22,13 @@ var guild;
 var channel;
 
 const handleCommand = async (message, args, permissions) => {
-  guild = message.guild;
-  channel = message.channel;
   switch (args[0]) {
     case commandType.START: {
       if (!message.member.hasPermission(permissions.FLAGS.ADMINISTRATOR)) {
         return;
       }
+      guild = message.guild;
+      channel = message.channel;
       init(message, permissions).then(() => start(message));
       break;
     }
