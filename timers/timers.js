@@ -1,25 +1,54 @@
 const moment = require("moment");
+const sender = require("../commands/shared/sender");
 const {
   commandType,
   daysOfWeek,
+  timersDescription,
   ABYSS_OPEN_TIME,
   ABYSS_CLOSE_TIME,
   ABYSS_CALC_OFFSET,
+  ABYSS_REMIND_OFFSET,
   OPEN_WORLD_CLOSE_TIME,
   OPEN_WORLD_RESET_TIME,
   OPEN_WORLD_LOCK_TIME,
+  SUBSCRIBER_ROLE,
+  SUBSCRIBER_MSG,
   REFRESH_RATE
 } = require("./constants.js");
 
 var isRunning = false;
+var reminderSent = false;
+var guild;
+var channel;
 
-const handleCommand = (message, args, permissions) => {
+const handleCommand = async (message, args, permissions) => {
+  guild = message.guild;
+  channel = message.channel;
   switch (args[0]) {
     case commandType.START: {
+      if (!message.member.hasPermission(permissions.FLAGS.ADMINISTRATOR)) {
+        return;
+      }
       init(message, permissions).then(() => start(message));
+      break;
     }
     case commandType.STOP: {
+      if (!message.member.hasPermission(permissions.FLAGS.ADMINISTRATOR)) {
+        return;
+      }
       stop();
+      break;
+    }
+    case commandType.SUBSCRIBE: {
+      await addSubscriber(message);
+      break;
+    }
+    case commandType.HELP: {
+      await sender.getHelp(
+        message.channel,
+        message.author.id,
+        timersDescription
+      );
     }
   }
 };
@@ -47,11 +76,24 @@ const init = (message, permissions) => {
               ])
               .then(channel => {
                 channel.setParent(category);
+                server.createRole({
+                  name: SUBSCRIBER_ROLE,
+                  mentionable: true
+                });
               });
           });
         });
       });
   });
+};
+
+const addSubscriber = async message => {
+  let role = message.guild.roles.find(r => r.name === SUBSCRIBER_ROLE);
+  let member = message.member;
+  let msg = `<@${message.author.id}> succesfuly subscribed to timers`;
+
+  member.addRole(role);
+  await sender.sendMessage(channel, msg);
 };
 
 const start = message => {
@@ -94,6 +136,28 @@ const getNextDayOfWeek = (date, dayOfWeek, offset, minutesOffset = 0) => {
   return resultDate;
 };
 
+const remindSubscribers = () => {
+  let role = guild.roles.find(r => r.name === SUBSCRIBER_ROLE);
+
+  sender.sendRoleMention(channel, role, SUBSCRIBER_MSG);
+};
+
+const resetRemindStatus = () => {
+  reminderSent = false;
+};
+
+const getOngoingAbyssStatus = duration => {
+  return `🔥❗❗ Ongoing ${duration}`;
+};
+
+const getPreparingAbyssStatus = duration => {
+  return `🔥💤 Preparing ${duration}`;
+};
+
+const getCalculatingAbyssStatus = duration => {
+  return `🔥⏳ Calculating ${duration}`;
+};
+
 const getDuration = (now, dayOfWeek, offset, minutesOffset = 0) => {
   let then = getNextDayOfWeek(now, dayOfWeek, offset, minutesOffset);
 
@@ -114,7 +178,7 @@ const setAbyssStatus = () => {
   switch (currentDay) {
     case daysOfWeek.MONDAY: {
       let duration = getDuration(dateNow, daysOfWeek.TUESDAY, ABYSS_OPEN_TIME);
-      return `🔥💤 Preparing ${duration}`;
+      return getPreparingAbyssStatus(duration);
     }
     case daysOfWeek.TUESDAY: {
       if (dateNow.hour() <= ABYSS_OPEN_TIME) {
@@ -123,14 +187,14 @@ const setAbyssStatus = () => {
           daysOfWeek.TUESDAY,
           ABYSS_OPEN_TIME
         );
-        return `🔥💤 Preparing ${duration}`;
+        return getPreparingAbyssStatus(duration);
       } else {
         let duration = getDuration(
           dateNow,
           daysOfWeek.THURSDAY,
           ABYSS_CLOSE_TIME
         );
-        return `🔥❗❗ Ongoing ${duration}`;
+        return getOngoingAbyssStatus(duration);
       }
     }
     case daysOfWeek.WEDNESDAY: {
@@ -139,7 +203,7 @@ const setAbyssStatus = () => {
         daysOfWeek.THURSDAY,
         ABYSS_CLOSE_TIME
       );
-      return `🔥❗❗ Ongoing ${duration}`;
+      return getOngoingAbyssStatus(duration);
     }
     case daysOfWeek.THURSDAY: {
       if (dateNow.hour() < ABYSS_CLOSE_TIME) {
@@ -148,7 +212,14 @@ const setAbyssStatus = () => {
           daysOfWeek.THURSDAY,
           ABYSS_CLOSE_TIME
         );
-        return `🔥❗❗ Ongoing ${duration}`;
+        if (
+          dateNow.hour() == ABYSS_CLOSE_TIME - ABYSS_REMIND_OFFSET &&
+          !reminderSent
+        ) {
+          reminderSent = true;
+          remindSubscribers();
+        }
+        return getOngoingAbyssStatus(duration);
       } else if (
         dateNow.hour() == ABYSS_CLOSE_TIME &&
         dateNow.minutes() < ABYSS_CALC_OFFSET
@@ -159,39 +230,47 @@ const setAbyssStatus = () => {
           ABYSS_CLOSE_TIME,
           ABYSS_CALC_OFFSET
         );
-        return `🔥⏳ Calculating ${duration}`;
+        resetRemindStatus();
+        return getCalculatingAbyssStatus(duration);
       } else {
         let duration = getDuration(dateNow, daysOfWeek.FRIDAY, ABYSS_OPEN_TIME);
-        return `🔥💤 Preparing ${duration}`;
+        return getPreparingAbyssStatus(duration);
       }
     }
     case daysOfWeek.FRIDAY: {
       if (dateNow.hour() <= ABYSS_OPEN_TIME) {
         let duration = getDuration(dateNow, daysOfWeek.FRIDAY, ABYSS_OPEN_TIME);
-        return `🔥💤 Preparing ${duration}`;
+        return getPreparingAbyssStatus(duration);
       } else {
         let duration = getDuration(
           dateNow,
           daysOfWeek.SUNDAY,
           ABYSS_CLOSE_TIME
         );
-        return `🔥❗❗ Ongoing ${duration}`;
+        return getOngoingAbyssStatus(duration);
       }
     }
     case daysOfWeek.SATURDAY: {
       let duration = getDuration(dateNow, daysOfWeek.SUNDAY, ABYSS_CLOSE_TIME);
-      return `🔥❗❗ Ongoing ${duration}`;
+      return getOngoingAbyssStatus(duration);
     }
     case daysOfWeek.SUNDAY: {
-      if (dateNow.hour() < 22) {
+      if (dateNow.hour() < ABYSS_CLOSE_TIME) {
         let duration = getDuration(
           dateNow,
           daysOfWeek.SUNDAY,
           ABYSS_CLOSE_TIME
         );
-        return `🔥❗❗ Ongoing ${duration}`;
+        if (
+          dateNow.hour() == ABYSS_CLOSE_TIME - ABYSS_REMIND_OFFSET &&
+          !reminderSent
+        ) {
+          reminderSent = true;
+          remindSubscribers();
+        }
+        return getOngoingAbyssStatus(duration);
       } else if (
-        dateNow.hour() == 22 &&
+        dateNow.hour() == ABYSS_CLOSE_TIME &&
         dateNow.minutes() < ABYSS_CALC_OFFSET
       ) {
         let duration = getDuration(
@@ -200,17 +279,26 @@ const setAbyssStatus = () => {
           ABYSS_CLOSE_TIME,
           ABYSS_CALC_OFFSET
         );
-        return `🔥⏳ Calculating ${duration}`;
+        resetRemindStatus();
+        return getCalculatingAbyssStatus(duration);
       } else {
         let duration = getDuration(
           dateNow,
           daysOfWeek.TUESDAY,
           ABYSS_OPEN_TIME
         );
-        return `🔥💤 Preparing ${duration}`;
+        return getPreparingAbyssStatus(duration);
       }
     }
   }
+};
+
+const getOngoingWorldStatus = duration => {
+  return `🌏❗❗ Ongoing ${duration}`;
+};
+
+const getLockedWorldStatus = duration => {
+  return `🌏🔒 Locked ${duration}`;
 };
 
 const setOpenWorldStatus = () => {
@@ -225,7 +313,7 @@ const setOpenWorldStatus = () => {
           daysOfWeek.MONDAY,
           OPEN_WORLD_CLOSE_TIME
         );
-        return `🌏❗❗ Ongoing ${duration}`;
+        return getOngoingWorldStatus(duration);
       } else if (
         dateNow.hour() >= OPEN_WORLD_CLOSE_TIME &&
         dateNow.hour() <= OPEN_WORLD_RESET_TIME
@@ -236,14 +324,14 @@ const setOpenWorldStatus = () => {
           OPEN_WORLD_CLOSE_TIME,
           OPEN_WORLD_LOCK_TIME
         );
-        return `🌏🔒 Locked ${duration}`;
+        return getLockedWorldStatus(duration);
       } else {
         let duration = getDuration(
           dateNow,
           daysOfWeek.THURSDAY,
           OPEN_WORLD_CLOSE_TIME
         );
-        return `🌏❗❗ Ongoing ${duration}`;
+        return getOngoingWorldStatus(duration);
       }
     }
     case daysOfWeek.TUESDAY: {
@@ -252,7 +340,7 @@ const setOpenWorldStatus = () => {
         daysOfWeek.THURSDAY,
         OPEN_WORLD_CLOSE_TIME
       );
-      return `🌏❗❗ Ongoing ${duration}`;
+      return getOngoingWorldStatus(duration);
     }
     case daysOfWeek.WEDNESDAY: {
       let duration = getDuration(
@@ -260,7 +348,7 @@ const setOpenWorldStatus = () => {
         daysOfWeek.THURSDAY,
         OPEN_WORLD_CLOSE_TIME
       );
-      return `🌏❗❗ Ongoing ${duration}`;
+      return getOngoingWorldStatus(duration);
     }
     case daysOfWeek.THURSDAY: {
       if (dateNow.hour() < OPEN_WORLD_CLOSE_TIME) {
@@ -269,7 +357,7 @@ const setOpenWorldStatus = () => {
           daysOfWeek.THURSDAY,
           OPEN_WORLD_CLOSE_TIME
         );
-        return `🌏❗❗ Ongoing ${duration}`;
+        return getOngoingWorldStatus(duration);
       } else if (
         dateNow.hour() >= OPEN_WORLD_CLOSE_TIME &&
         dateNow.hour() <= OPEN_WORLD_RESET_TIME
@@ -280,14 +368,14 @@ const setOpenWorldStatus = () => {
           OPEN_WORLD_CLOSE_TIME,
           OPEN_WORLD_LOCK_TIME
         );
-        return `🌏🔒 Locked ${duration}`;
+        return getLockedWorldStatus(duration);
       } else {
         let duration = getDuration(
           dateNow,
           daysOfWeek.SATURDAY,
           OPEN_WORLD_CLOSE_TIME
         );
-        return `🌏❗❗ Ongoing ${duration}`;
+        return getOngoingWorldStatus(duration);
       }
     }
     case daysOfWeek.FRIDAY: {
@@ -296,7 +384,7 @@ const setOpenWorldStatus = () => {
         daysOfWeek.SATURDAY,
         OPEN_WORLD_CLOSE_TIME
       );
-      return `🌏❗❗ Ongoing ${duration}`;
+      return getOngoingWorldStatus(duration);
     }
     case daysOfWeek.SATURDAY: {
       if (dateNow.hour() < OPEN_WORLD_CLOSE_TIME) {
@@ -305,7 +393,7 @@ const setOpenWorldStatus = () => {
           daysOfWeek.SATURDAY,
           OPEN_WORLD_CLOSE_TIME
         );
-        return `🌏❗❗ Ongoing ${duration}`;
+        return getOngoingWorldStatus(duration);
       } else if (
         dateNow.hour() >= OPEN_WORLD_CLOSE_TIME &&
         dateNow.hour() <= OPEN_WORLD_RESET_TIME
@@ -316,14 +404,14 @@ const setOpenWorldStatus = () => {
           OPEN_WORLD_CLOSE_TIME,
           OPEN_WORLD_LOCK_TIME
         );
-        return `🌏🔒 Locked ${duration}`;
+        return getLockedWorldStatus(duration);
       } else {
         let duration = getDuration(
           dateNow,
           daysOfWeek.MONDAY,
           OPEN_WORLD_CLOSE_TIME
         );
-        return `🌏❗❗ Ongoing ${duration}`;
+        return getOngoingWorldStatus(duration);
       }
     }
     case daysOfWeek.SUNDAY: {
@@ -332,7 +420,7 @@ const setOpenWorldStatus = () => {
         daysOfWeek.MONDAY,
         OPEN_WORLD_CLOSE_TIME
       );
-      return `🌏❗❗ Ongoing ${duration}`;
+      return getOngoingWorldStatus(duration);
     }
   }
 };
