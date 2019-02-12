@@ -5,7 +5,7 @@ const utils = require("./commands/utils/utils.js");
 const reddit = require("./commands/reddit/reddit.js");
 const danbooru = require("./commands/danbooru/danbooru.js");
 const sender = require("./commands/shared/sender.js");
-const timers = require("./timers/timers.js");
+const timers = require("./timers/timerHandler.js");
 
 const commands = {
   PING: "ping",
