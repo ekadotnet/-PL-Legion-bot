@@ -1,5 +1,10 @@
 const sender = require("../shared/sender.js");
-const { pingDescription, meDescription, helpDescription } = require("./constants.js");
+const handler = require("../shared/logger.js");
+const {
+  pingDescription,
+  meDescription,
+  helpDescription
+} = require("./constants.js");
 
 const ping = async (message, args, client) => {
   let user = message.author.id;
@@ -11,6 +16,13 @@ const ping = async (message, args, client) => {
     m.edit(
       `<@${user}>\nPong!\nYour Latency: ${m.createdTimestamp -
         message.createdTimestamp}ms.\nAPI Latency: ${Math.round(client.ping)}ms`
+    ).then(
+      () => {
+        handler.onResolved(ping, { guild: message.guild.name });
+      },
+      reason => {
+        return handler.onRejected(reason, ping);
+      }
     );
   }
 };
