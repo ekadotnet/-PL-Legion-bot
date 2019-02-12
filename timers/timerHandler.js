@@ -107,26 +107,32 @@ const init = (message, permissions) => {
                               });
                             }
                           );
-                          server
-                            .createRole({
-                              name: SUBSCRIBER_ROLE,
-                              mentionable: true
-                            })
-                            .then(
-                              () =>
-                                handler.onResolved(init, {
-                                  guild: server.name
-                                }),
-                              reason => {
-                                return handler.onRejected(
-                                  reason,
-                                  createChannel,
-                                  {
-                                    step: `Create subscriber role`
-                                  }
-                                );
-                              }
-                            );
+                          if (
+                            message.guild.roles.find(
+                              r => r.name === SUBSCRIBER_ROLE
+                            ) == null
+                          ) {
+                            server
+                              .createRole({
+                                name: SUBSCRIBER_ROLE,
+                                mentionable: true
+                              })
+                              .then(
+                                () =>
+                                  handler.onResolved(init, {
+                                    guild: server.name
+                                  }),
+                                reason => {
+                                  return handler.onRejected(
+                                    reason,
+                                    createChannel,
+                                    {
+                                      step: `Create subscriber role`
+                                    }
+                                  );
+                                }
+                              );
+                          }
                           server
                             .createChannel("reminder-chan", "text", [
                               {
