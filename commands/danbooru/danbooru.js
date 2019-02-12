@@ -16,18 +16,18 @@ const sendErrorMessage = async (channel, user, errorType) => {
   switch (errorType) {
     case errorTypes.TOO_MUCH_TAGS: {
       let message = `<@${user}> you gave me too much tags uwu`;
-      sender.sendMessage(channel, message);
+      await sender.sendMessage(channel, message);
       break;
     }
     case errorTypes.NO_RESULTS: {
       let message = `<@${user}> I found 0 images with given tag(s), are you sure they're correct?`;
-      sender.sendMessage(channel, message);
+      await sender.sendMessage(channel, message);
       break;
     }
     case errorTypes.DEFAULT:
     default: {
       let message = `<@${user}> Something went wrong, sowwy`;
-      sender.sendMessage(channel, message);
+      await sender.sendMessage(channel, message);
       break;
     }
   }
