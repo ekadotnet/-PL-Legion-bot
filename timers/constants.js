@@ -24,6 +24,7 @@ module.exports = {
   commandType: {
     START: "start",
     STOP: "stop",
+    RESTART: "restart",
     SUBSCRIBE: "subscribe",
     HELP: "help"
   },
