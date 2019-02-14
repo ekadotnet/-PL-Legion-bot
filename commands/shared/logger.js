@@ -4,7 +4,7 @@ logger.useDefaults();
 logger.setLevel(logger.INFO);
 
 const onResolved = (func, params = undefined) => {
-  logger.info(`Promise resolved in: ${func.name}\n`);
+  logger.debug(`Promise resolved in: ${func.name}\n`);
   params === undefined ? null : logger.info(params);
 };
 
