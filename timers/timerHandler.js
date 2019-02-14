@@ -9,7 +9,7 @@ const {
   REFRESH_RATE
 } = require("./constants.js");
 
-var isRunning = false;
+var isRunning = true;
 
 const handleCommand = async (message, args, permissions) => {
   switch (args[0]) {
@@ -194,10 +194,8 @@ const init = (message, permissions) => {
   );
 };
 
-const start = message => {
-  isRunning = true;
-  setTimeout(() => start(message), REFRESH_RATE);
-
+const updateStatus = message => {
+  var timeout = setTimeout(() => updateStatus(message), 10000);
   if (isRunning) {
     let abyssCategory = message.guild.channels.find(channel =>
       channel.name.startsWith("Abyss")
@@ -231,8 +229,13 @@ const start = message => {
       handler.onError(error);
     }
   } else {
-    return;
+    clearTimeout(timeout);
   }
+};
+
+const start = message => {
+  isRunning = true;
+  updateStatus(message);
 };
 
 const stop = () => {
