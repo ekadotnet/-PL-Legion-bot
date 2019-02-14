@@ -195,7 +195,7 @@ const init = (message, permissions) => {
 };
 
 const updateStatus = message => {
-  var timeout = setTimeout(() => updateStatus(message), 10000);
+  var timeout = setTimeout(() => updateStatus(message), REFRESH_RATE);
   if (isRunning) {
     let abyssCategory = message.guild.channels.find(channel =>
       channel.name.startsWith("Abyss")
