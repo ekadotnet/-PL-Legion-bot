@@ -4,7 +4,7 @@ const client = new Discord.Client();
 const utils = require("./commands/utils/utils.js");
 const reddit = require("./commands/reddit/reddit.js");
 const danbooru = require("./commands/danbooru/danbooru.js");
-const sender = require("./commands/shared/sender.js");
+const handler = require("./commands/shared/logger.js");
 const timers = require("./timers/timerHandler.js");
 
 const commands = {
@@ -19,7 +19,7 @@ const commands = {
 };
 
 client.on("ready", () => {
-  console.log(
+  handler.log(
     `Bot has started, with ${client.users.size} users, in ${
       client.channels.size
     } channels of ${client.guilds.size} guilds.`
@@ -28,7 +28,7 @@ client.on("ready", () => {
 });
 
 client.on("guildCreate", guild => {
-  console.log(
+  handler.log(
     `New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${
       guild.memberCount
     } members!`
@@ -37,12 +37,12 @@ client.on("guildCreate", guild => {
 });
 
 client.on("guildDelete", guild => {
-  console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
+  handler.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
   client.user.setActivity(`Thighs save lives`);
 });
 
 client.on("error", error => {
-  console.log(`${error.name} error occured:\n${error.message}`);
+  handler.onError(error);
 });
 
 client.on("message", async message => {
@@ -85,13 +85,7 @@ client.on("message", async message => {
       await utils.help(message, args);
       break;
     }
-    default: {
-      let msg = `<@${
-        message.author.id
-      }> Unknown command !${command}. Try !help or !commands to get more info.`;
-      await sender.sendMessage(message.channel, msg);
-    }
   }
 });
 
-client.login(process.env.TOKEN);
+client.login(process.env.DEV_TOKEN);

@@ -1,7 +1,7 @@
 const logger = require("js-logger");
 
 logger.useDefaults();
-logger.setLevel(logger.WARN);
+logger.setLevel(logger.INFO);
 
 const onResolved = (func, params = undefined) => {
   logger.info(`Promise resolved in: ${func.name}\n`);
@@ -13,7 +13,17 @@ const onRejected = (reason, func, params = undefined) => {
   params === undefined ? null : logger.error(params);
 };
 
+const onError = error => {
+  logger.error(`${error.name} error occured:\n${error.message}`);
+};
+
+const log = message => {
+  logger.info(message);
+};
+
 module.exports = {
   onResolved: onResolved,
-  onRejected: onRejected
+  onRejected: onRejected,
+  onError: onError,
+  log: log
 };
