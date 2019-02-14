@@ -9,7 +9,7 @@ const {
   REFRESH_RATE
 } = require("./constants.js");
 
-var isRunning = false;
+var isRunning = true;
 
 const handleCommand = async (message, args, permissions) => {
   switch (args[0]) {
@@ -51,7 +51,9 @@ const handleCommand = async (message, args, permissions) => {
       break;
     }
     case commandType.RESTART: {
-      if (!message.member.hasPermission(permissions.FLAGS.MANAGE_CHANNELS)) {
+      if (
+        message.guild.channels.find(channel => channel.name == `Abyss`) == null
+      ) {
         return;
       }
       start(message);
@@ -192,14 +194,13 @@ const init = (message, permissions) => {
   );
 };
 
-const start = message => {
-  isRunning = true;
-
-  var interval = setInterval(() => {
-    if (isRunning) {
-      let abyssCategory = message.guild.channels.find(channel =>
-        channel.name.startsWith("Abyss")
-      );
+const updateStatus = message => {
+  var timeout = setTimeout(() => updateStatus(message), 10000);
+  if (isRunning) {
+    let abyssCategory = message.guild.channels.find(channel =>
+      channel.name.startsWith("Abyss")
+    );
+    try {
       abyssCategory.children.forEach(channel =>
         channel
           .setName(setAbyssStatus())
@@ -208,22 +209,33 @@ const start = message => {
             reason => handler.onRejected(reason, setAbyssStatus)
           )
       );
-
-      let openWorldCategory = message.guild.channels.find(channel =>
-        channel.name.startsWith("Open")
-      );
-      openWorldCategory.children.forEach(channel =>
-        channel
-          .setName(setOpenWorldStatus())
-          .then(
-            () => handler.onResolved(setOpenWorldStatus),
-            reason => handler.onRejected(reason, setOpenWorldStatus)
-          )
-      );
-    } else {
-      clearInterval(interval);
+    } catch (error) {
+      handler.onError(error);
     }
-  }, REFRESH_RATE);
+
+    let openWorldCategory = message.guild.channels.find(channel =>
+      channel.name.startsWith("Open")
+    );
+    try {
+      openWorldCategory.children.forEach(channel =>
+        channel.setName(setOpenWorldStatus()).then(
+          () => {
+            handler.onResolved(setOpenWorldStatus);
+          },
+          reason => handler.onRejected(reason, setOpenWorldStatus)
+        )
+      );
+    } catch (error) {
+      handler.onError(error);
+    }
+  } else {
+    clearTimeout(timeout);
+  }
+};
+
+const start = message => {
+  isRunning = true;
+  updateStatus(message);
 };
 
 const stop = () => {
