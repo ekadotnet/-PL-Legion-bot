@@ -48,7 +48,7 @@ module.exports = {
   OPEN_WORLD_RESET_TIME: 3,
   OPEN_WORLD_LOCK_TIME: 60,
 
-  REFRESH_RATE: 30000,
+  REFRESH_RATE: 60000,
 
   SUBSCRIBER_ROLE: "Remind me",
   SUBSCRIBER_MSG: "abyss is ending!"

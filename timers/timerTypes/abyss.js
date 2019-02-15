@@ -32,8 +32,8 @@ const addSubscriber = async message => {
   await sender.sendMessage(channel, msg);
 };
 
-const remindSubscribers = () => {
-  let role = guild.roles.find(r => r.name === SUBSCRIBER_ROLE);
+const remindSubscribers = message => {
+  let role = message.guild.roles.find(r => r.name === SUBSCRIBER_ROLE);
   let channel = message.guild.channels.find(
     channel => channel.name == `reminder-chan`
   );
@@ -99,7 +99,7 @@ const setAbyssStatus = () => {
           !reminderSent
         ) {
           reminderSent = true;
-          remindSubscribers();
+          remindSubscribers(message);
         }
         return getOngoingAbyssStatus(duration);
       } else if (
@@ -148,7 +148,7 @@ const setAbyssStatus = () => {
           !reminderSent
         ) {
           reminderSent = true;
-          remindSubscribers();
+          remindSubscribers(message);
         }
         return getOngoingAbyssStatus(duration);
       } else if (

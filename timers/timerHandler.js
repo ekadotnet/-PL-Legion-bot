@@ -229,6 +229,7 @@ const updateStatus = message => {
       handler.onError(error);
     }
   } else {
+    handler.log("clearTimeout");
     clearTimeout(timeout);
   }
 };
