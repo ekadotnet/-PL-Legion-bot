@@ -25,11 +25,11 @@ const handleCommand = async (message, args, permissions) => {
         message.guild.channels.find(channel => channel.name == `Open World`) !=
           null
       ) {
-        start(message);
+        start(message.guild);
       } else {
         init(message, permissions).then(
           () => {
-            start(message);
+            start(message.guild);
             handler.onResolved(handleCommand, { guild: message.guild.name });
           },
           reason =>
@@ -56,7 +56,7 @@ const handleCommand = async (message, args, permissions) => {
       ) {
         return;
       }
-      start(message);
+      start(message.guild);
       break;
     }
     case commandType.SUBSCRIBE: {
@@ -70,6 +70,15 @@ const handleCommand = async (message, args, permissions) => {
         timersDescription
       );
     }
+  }
+};
+
+const handleBotRestart = guild => {
+  if (
+    guild.channels.find(channel => channel.name == `Abyss`) != null &&
+    guild.channels.find(channel => channel.name == `Open World`) != null
+  ) {
+    start(guild);
   }
 };
 
@@ -194,10 +203,10 @@ const init = (message, permissions) => {
   );
 };
 
-const updateStatus = message => {
-  var timeout = setTimeout(() => updateStatus(message), REFRESH_RATE);
+const updateStatus = guild => {
+  var timeout = setTimeout(() => updateStatus(guild), REFRESH_RATE);
   if (isRunning) {
-    let abyssCategory = message.guild.channels.find(channel =>
+    let abyssCategory = guild.channels.find(channel =>
       channel.name.startsWith("Abyss")
     );
     try {
@@ -213,7 +222,7 @@ const updateStatus = message => {
       handler.onError(error);
     }
 
-    let openWorldCategory = message.guild.channels.find(channel =>
+    let openWorldCategory = guild.channels.find(channel =>
       channel.name.startsWith("Open")
     );
     try {
@@ -244,5 +253,6 @@ const stop = () => {
 };
 
 module.exports = {
-  handleCommand: handleCommand
+  handleCommand: handleCommand,
+  handleBotRestart: handleBotRestart
 };

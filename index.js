@@ -25,6 +25,7 @@ client.on("ready", () => {
     } channels of ${client.guilds.size} guilds.`
   );
   client.user.setActivity(`Thighs save lives`);
+  client.guilds.forEach(guild => timers.handleBotRestart(guild));
 });
 
 client.on("guildCreate", guild => {
@@ -88,4 +89,4 @@ client.on("message", async message => {
   }
 });
 
-client.login(process.env.TOKEN);
+client.login(process.env.DEV_TOKEN);
