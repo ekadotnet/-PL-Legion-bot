@@ -1,4 +1,5 @@
 const moment = require("moment");
+const sender = require("../../commands/shared/sender.js");
 const { getDuration } = require("../duration.js");
 const {
   daysOfWeek,
@@ -32,11 +33,9 @@ const addSubscriber = async message => {
   await sender.sendMessage(channel, msg);
 };
 
-const remindSubscribers = message => {
-  let role = message.guild.roles.find(r => r.name === SUBSCRIBER_ROLE);
-  let channel = message.guild.channels.find(
-    channel => channel.name == `reminder-chan`
-  );
+const remindSubscribers = guild => {
+  let role = guild.roles.find(r => r.name === SUBSCRIBER_ROLE);
+  let channel = guild.channels.find(channel => channel.name == `reminder-chan`);
 
   sender.sendRoleMention(channel, role, SUBSCRIBER_MSG);
 };
@@ -53,7 +52,7 @@ const getCalculatingAbyssStatus = duration => {
   return `🔥⏳ Calculating ${duration}`;
 };
 
-const setAbyssStatus = () => {
+const setAbyssStatus = guild => {
   let dateNow = moment();
   let currentDay = dateNow.day();
 
@@ -99,7 +98,7 @@ const setAbyssStatus = () => {
           !reminderSent
         ) {
           reminderSent = true;
-          remindSubscribers(message);
+          remindSubscribers(guild);
         }
         return getOngoingAbyssStatus(duration);
       } else if (
@@ -148,7 +147,7 @@ const setAbyssStatus = () => {
           !reminderSent
         ) {
           reminderSent = true;
-          remindSubscribers(message);
+          remindSubscribers(guild);
         }
         return getOngoingAbyssStatus(duration);
       } else if (

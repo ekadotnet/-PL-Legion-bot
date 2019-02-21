@@ -17,8 +17,6 @@ const handleCommand = async (message, args, permissions) => {
       if (!message.member.hasPermission(permissions.FLAGS.ADMINISTRATOR)) {
         return;
       }
-      guild = message.guild;
-      channel = message.channel;
       if (
         message.guild.channels.find(channel => channel.name == `Abyss`) !=
           null &&
@@ -83,14 +81,14 @@ const handleBotRestart = guild => {
 };
 
 const init = (message, permissions) => {
-  var server = message.guild;
+  var guild = message.guild;
 
-  return server.createChannel("Abyss", "category").then(
+  return guild.createChannel("Abyss", "category").then(
     category => {
-      server
+      guild
         .createChannel("Abyss", "voice", [
           {
-            id: server.id,
+            id: guild.id,
             denied: permissions.ALL
           }
         ])
@@ -98,12 +96,12 @@ const init = (message, permissions) => {
           channel => {
             channel.setParent(category).then(
               () => {
-                server.createChannel("Open World", "category").then(
+                guild.createChannel("Open World", "category").then(
                   category => {
-                    server
+                    guild
                       .createChannel("Round", "voice", [
                         {
-                          id: server.id,
+                          id: guild.id,
                           denied: permissions.ALL
                         }
                       ])
@@ -111,7 +109,7 @@ const init = (message, permissions) => {
                         channel => {
                           channel.setParent(category).then(
                             () =>
-                              handler.onResolved(init, { guild: server.name }),
+                              handler.onResolved(init, { guild: guild.name }),
                             reason => {
                               return handler.onRejected(reason, createChannel, {
                                 step: `Set Open World timer parent`
@@ -123,7 +121,7 @@ const init = (message, permissions) => {
                               r => r.name === SUBSCRIBER_ROLE
                             ) == null
                           ) {
-                            server
+                            guild
                               .createRole({
                                 name: SUBSCRIBER_ROLE,
                                 mentionable: true
@@ -131,7 +129,7 @@ const init = (message, permissions) => {
                               .then(
                                 () =>
                                   handler.onResolved(init, {
-                                    guild: server.name
+                                    guild: guild.name
                                   }),
                                 reason => {
                                   return handler.onRejected(
@@ -144,17 +142,17 @@ const init = (message, permissions) => {
                                 }
                               );
                           }
-                          server
+                          guild
                             .createChannel("reminder-chan", "text", [
                               {
-                                id: server.id,
+                                id: guild.id,
                                 denied: permissions.ALL
                               }
                             ])
                             .then(
                               () =>
                                 handler.onResolved(init, {
-                                  guild: server.name
+                                  guild: guild.name
                                 }),
                               reason => {
                                 return handler.onRejected(
@@ -212,7 +210,7 @@ const updateStatus = guild => {
     try {
       abyssCategory.children.forEach(channel =>
         channel
-          .setName(setAbyssStatus())
+          .setName(setAbyssStatus(guild))
           .then(
             () => handler.onResolved(setAbyssStatus),
             reason => handler.onRejected(reason, setAbyssStatus)
@@ -243,9 +241,9 @@ const updateStatus = guild => {
   }
 };
 
-const start = message => {
+const start = guild => {
   isRunning = true;
-  updateStatus(message);
+  updateStatus(guild);
 };
 
 const stop = () => {
