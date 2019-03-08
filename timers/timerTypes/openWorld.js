@@ -15,126 +15,57 @@ const getLockedWorldStatus = duration => {
   return `🌏🔒 Locked ${duration}`;
 };
 
+const handleResetDay = (dateNow, currentDay, nextReset) => {
+  if (dateNow.hour() < OPEN_WORLD_CLOSE_TIME) {
+    let duration = getDuration(dateNow, currentDay, OPEN_WORLD_CLOSE_TIME);
+    return getOngoingWorldStatus(duration);
+  } else if (
+    dateNow.hour() >= OPEN_WORLD_CLOSE_TIME &&
+    dateNow.hour() <= OPEN_WORLD_RESET_TIME
+  ) {
+    let duration = getDuration(
+      dateNow,
+      currentDay,
+      OPEN_WORLD_CLOSE_TIME,
+      OPEN_WORLD_LOCK_TIME
+    );
+    return getLockedWorldStatus(duration);
+  } else {
+    let duration = getDuration(dateNow, nextReset, OPEN_WORLD_CLOSE_TIME);
+    return getOngoingWorldStatus(duration);
+  }
+};
+
+const handleOngoingDay = (dateNow, nextReset) => {
+  let duration = getDuration(dateNow, nextReset, OPEN_WORLD_CLOSE_TIME);
+  return getOngoingWorldStatus(duration);
+};
+
 const setOpenWorldStatus = () => {
   let dateNow = moment();
   let currentDay = dateNow.day();
 
   switch (currentDay) {
     case daysOfWeek.MONDAY: {
-      if (dateNow.hour() < OPEN_WORLD_CLOSE_TIME) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.MONDAY,
-          OPEN_WORLD_CLOSE_TIME
-        );
-        return getOngoingWorldStatus(duration);
-      } else if (
-        dateNow.hour() >= OPEN_WORLD_CLOSE_TIME &&
-        dateNow.hour() <= OPEN_WORLD_RESET_TIME
-      ) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.MONDAY,
-          OPEN_WORLD_CLOSE_TIME,
-          OPEN_WORLD_LOCK_TIME
-        );
-        return getLockedWorldStatus(duration);
-      } else {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.THURSDAY,
-          OPEN_WORLD_CLOSE_TIME
-        );
-        return getOngoingWorldStatus(duration);
-      }
+      return handleResetDay(dateNow, currentDay, daysOfWeek.THURSDAY);
     }
     case daysOfWeek.TUESDAY: {
-      let duration = getDuration(
-        dateNow,
-        daysOfWeek.THURSDAY,
-        OPEN_WORLD_CLOSE_TIME
-      );
-      return getOngoingWorldStatus(duration);
+      return handleOngoingDay(dateNow, daysOfWeek.THURSDAY);
     }
     case daysOfWeek.WEDNESDAY: {
-      let duration = getDuration(
-        dateNow,
-        daysOfWeek.THURSDAY,
-        OPEN_WORLD_CLOSE_TIME
-      );
-      return getOngoingWorldStatus(duration);
+      return handleOngoingDay(dateNow, daysOfWeek.THURSDAY);
     }
     case daysOfWeek.THURSDAY: {
-      if (dateNow.hour() < OPEN_WORLD_CLOSE_TIME) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.THURSDAY,
-          OPEN_WORLD_CLOSE_TIME
-        );
-        return getOngoingWorldStatus(duration);
-      } else if (
-        dateNow.hour() >= OPEN_WORLD_CLOSE_TIME &&
-        dateNow.hour() <= OPEN_WORLD_RESET_TIME
-      ) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.THURSDAY,
-          OPEN_WORLD_CLOSE_TIME,
-          OPEN_WORLD_LOCK_TIME
-        );
-        return getLockedWorldStatus(duration);
-      } else {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.SATURDAY,
-          OPEN_WORLD_CLOSE_TIME
-        );
-        return getOngoingWorldStatus(duration);
-      }
+      return handleResetDay(dateNow, currentDay, daysOfWeek.SATURDAY);
     }
     case daysOfWeek.FRIDAY: {
-      let duration = getDuration(
-        dateNow,
-        daysOfWeek.SATURDAY,
-        OPEN_WORLD_CLOSE_TIME
-      );
-      return getOngoingWorldStatus(duration);
+      return handleOngoingDay(dateNow, daysOfWeek.SATURDAY);
     }
     case daysOfWeek.SATURDAY: {
-      if (dateNow.hour() < OPEN_WORLD_CLOSE_TIME) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.SATURDAY,
-          OPEN_WORLD_CLOSE_TIME
-        );
-        return getOngoingWorldStatus(duration);
-      } else if (
-        dateNow.hour() >= OPEN_WORLD_CLOSE_TIME &&
-        dateNow.hour() <= OPEN_WORLD_RESET_TIME
-      ) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.SATURDAY,
-          OPEN_WORLD_CLOSE_TIME,
-          OPEN_WORLD_LOCK_TIME
-        );
-        return getLockedWorldStatus(duration);
-      } else {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.MONDAY,
-          OPEN_WORLD_CLOSE_TIME
-        );
-        return getOngoingWorldStatus(duration);
-      }
+      return handleResetDay(dateNow, currentDay, daysOfWeek.MONDAY);
     }
     case daysOfWeek.SUNDAY: {
-      let duration = getDuration(
-        dateNow,
-        daysOfWeek.MONDAY,
-        OPEN_WORLD_CLOSE_TIME
-      );
-      return getOngoingWorldStatus(duration);
+      return handleOngoingDay(dateNow, daysOfWeek.MONDAY);
     }
   }
 };
