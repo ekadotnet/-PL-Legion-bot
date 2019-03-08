@@ -11,34 +11,29 @@ const {
 
 var isRunning = true;
 
+const timersUp = (guild, permissions) => {
+  init(guild, permissions).then(
+    () => {
+      start(guild);
+      handler.onResolved(handleCommand, { guild: guild.name });
+    },
+    reason =>
+      handler.onRejected(reason, handleCommand, {
+        args: args,
+        guild: guild.id,
+        guildName: guild.name,
+        channel: channel.name
+      })
+  );
+};
+
 const handleCommand = async (message, args, permissions) => {
   switch (args[0]) {
     case commandType.START: {
       if (!message.member.hasPermission(permissions.FLAGS.ADMINISTRATOR)) {
         return;
       }
-      if (
-        message.guild.channels.find(channel => channel.name == `Abyss`) !=
-          null &&
-        message.guild.channels.find(channel => channel.name == `Open World`) !=
-          null
-      ) {
-        start(message.guild);
-      } else {
-        init(message, permissions).then(
-          () => {
-            start(message.guild);
-            handler.onResolved(handleCommand, { guild: message.guild.name });
-          },
-          reason =>
-            handler.onRejected(reason, handleCommand, {
-              args: args,
-              guild: message.guild.id,
-              guildName: message.guild.name,
-              channel: message.channel.name
-            })
-        );
-      }
+      timersUp(message.guild, permissions);
       break;
     }
     case commandType.STOP: {
@@ -46,15 +41,6 @@ const handleCommand = async (message, args, permissions) => {
         return;
       }
       stop();
-      break;
-    }
-    case commandType.RESTART: {
-      if (
-        message.guild.channels.find(channel => channel.name == `Abyss`) == null
-      ) {
-        return;
-      }
-      start(message.guild);
       break;
     }
     case commandType.SUBSCRIBE: {
@@ -71,18 +57,32 @@ const handleCommand = async (message, args, permissions) => {
   }
 };
 
-const handleBotRestart = guild => {
-  if (
-    guild.channels.find(channel => channel.name == `Abyss`) != null &&
-    guild.channels.find(channel => channel.name == `Open World`) != null
-  ) {
-    start(guild);
-  }
+const checkIfAbyssTimerExists = guild => {
+  return guild.channels.find(channel => channel.name == `Abyss`) != null;
 };
 
-const init = (message, permissions) => {
-  var guild = message.guild;
+const checkIfOwTimerExists = guild => {
+  return guild.channels.find(channel => channel.name == `Open World`) != null;
+};
 
+const checkIfSubscriberRoleExists = guild => {
+  return guild.roles.find(r => r.name === SUBSCRIBER_ROLE) != null;
+};
+
+const checkIfReminderChannelExists = guild => {
+  return (
+    guild.channels.find(channel => channel.name == `reminder-chan`) != null
+  );
+};
+
+const handleBotRestart = (guild, permissions) => {
+  timersUp(guild, permissions);
+};
+
+const createAbyssTimer = (guild, permissions, skip) => {
+  if (skip) {
+    return Promise.resolve();
+  }
   return guild.createChannel("Abyss", "category").then(
     category => {
       guild
@@ -95,90 +95,7 @@ const init = (message, permissions) => {
         .then(
           channel => {
             channel.setParent(category).then(
-              () => {
-                guild.createChannel("Open World", "category").then(
-                  category => {
-                    guild
-                      .createChannel("Round", "voice", [
-                        {
-                          id: guild.id,
-                          denied: permissions.ALL
-                        }
-                      ])
-                      .then(
-                        channel => {
-                          channel.setParent(category).then(
-                            () =>
-                              handler.onResolved(init, { guild: guild.name }),
-                            reason => {
-                              return handler.onRejected(reason, createChannel, {
-                                step: `Set Open World timer parent`
-                              });
-                            }
-                          );
-                          if (
-                            message.guild.roles.find(
-                              r => r.name === SUBSCRIBER_ROLE
-                            ) == null
-                          ) {
-                            guild
-                              .createRole({
-                                name: SUBSCRIBER_ROLE,
-                                mentionable: true
-                              })
-                              .then(
-                                () =>
-                                  handler.onResolved(init, {
-                                    guild: guild.name
-                                  }),
-                                reason => {
-                                  return handler.onRejected(
-                                    reason,
-                                    createChannel,
-                                    {
-                                      step: `Create subscriber role`
-                                    }
-                                  );
-                                }
-                              );
-                          }
-                          guild
-                            .createChannel("reminder-chan", "text", [
-                              {
-                                id: guild.id,
-                                denied: permissions.ALL
-                              }
-                            ])
-                            .then(
-                              () =>
-                                handler.onResolved(init, {
-                                  guild: guild.name
-                                }),
-                              reason => {
-                                return handler.onRejected(
-                                  reason,
-                                  createChannel,
-                                  {
-                                    step: `Create subscriber channel`
-                                  }
-                                );
-                              }
-                            );
-                        },
-                        reason => {
-                          return handler.onRejected(reason, createChannel, {
-                            step: `Create Open World timer`
-                          });
-                        }
-                      );
-                  },
-                  reason => {
-                    return handler.onRejected(reason, createChannel, {
-                      step: `Create Open World category`
-                    });
-                  }
-                );
-              },
+              () => handler.onResolved(init, { guild: guild.name }),
               reason => {
                 return handler.onRejected(reason, createChannel, {
                   step: `Set Abyss timer parent`
@@ -201,8 +118,111 @@ const init = (message, permissions) => {
   );
 };
 
+const createOwTimer = (guild, permissions, skip) => {
+  if (skip) {
+    return Promise.resolve();
+  }
+  return guild.createChannel("Open World", "category").then(
+    category => {
+      guild
+        .createChannel("Round", "voice", [
+          {
+            id: guild.id,
+            denied: permissions.ALL
+          }
+        ])
+        .then(
+          channel => {
+            channel.setParent(category).then(
+              () => handler.onResolved(init, { guild: guild.name }),
+              reason => {
+                return handler.onRejected(reason, createChannel, {
+                  step: `Set Open World timer parent`
+                });
+              }
+            );
+          },
+          reason => {
+            return handler.onRejected(reason, createChannel, {
+              step: `Create Open World timer`
+            });
+          }
+        );
+    },
+    reason => {
+      return handler.onRejected(reason, createChannel, {
+        step: `Create Open World category`
+      });
+    }
+  );
+};
+
+const createReminderChannel = (guild, permissions, skip) => {
+  if (skip) {
+    return Promise.resolve();
+  }
+  return guild
+    .createChannel("reminder-chan", "text", [
+      {
+        id: guild.id,
+        denied: permissions.ALL
+      }
+    ])
+    .then(
+      () =>
+        handler.onResolved(init, {
+          guild: guild.name
+        }),
+      reason => {
+        return handler.onRejected(reason, createChannel, {
+          step: `Create subscriber channel`
+        });
+      }
+    );
+};
+
+const createSubscriberRole = (guild, skip) => {
+  if (skip) {
+    return Promise.resolve();
+  }
+  return guild
+    .createRole({
+      name: SUBSCRIBER_ROLE,
+      mentionable: true
+    })
+    .then(
+      () =>
+        handler.onResolved(init, {
+          guild: guild.name
+        }),
+      reason => {
+        return handler.onRejected(reason, createChannel, {
+          step: `Create subscriber role`
+        });
+      }
+    );
+};
+
+const init = (guild, permissions) => {
+  return createAbyssTimer(
+    guild,
+    permissions,
+    checkIfAbyssTimerExists(guild)
+  ).then(() =>
+    createOwTimer(guild, permissions, checkIfOwTimerExists(guild)).then(() =>
+      createReminderChannel(
+        guild,
+        permissions,
+        checkIfReminderChannelExists(guild)
+      ).then(() =>
+        createSubscriberRole(guild, checkIfSubscriberRoleExists(guild))
+      )
+    )
+  );
+};
+
 const updateStatus = guild => {
-  var timeout = setTimeout(() => updateStatus(guild), REFRESH_RATE);
+  let timeout = setTimeout(() => updateStatus(guild), REFRESH_RATE);
   if (isRunning) {
     let abyssCategory = guild.channels.find(channel =>
       channel.name.startsWith("Abyss")

@@ -13,10 +13,6 @@ const {
 
 var reminderSent = false;
 
-const resetRemindStatus = () => {
-  reminderSent = false;
-};
-
 const addSubscriber = async message => {
   let role = message.guild.roles.find(r => r.name === SUBSCRIBER_ROLE);
   let member = message.member;
@@ -31,6 +27,10 @@ const addSubscriber = async message => {
       })
   );
   await sender.sendMessage(channel, msg);
+};
+
+const resetRemindStatus = () => {
+  reminderSent = false;
 };
 
 const remindSubscribers = guild => {
@@ -52,124 +52,80 @@ const getCalculatingAbyssStatus = duration => {
   return `🔥⏳ Calculating ${duration}`;
 };
 
-const setAbyssStatus = guild => {
+const handleAbyssOpenDay = (dateNow, currentDay, closeDay) => {
+  if (dateNow.hour() < ABYSS_OPEN_TIME) {
+    let duration = getDuration(dateNow, currentDay, ABYSS_OPEN_TIME);
+    return getPreparingAbyssStatus(duration);
+  } else {
+    let duration = getDuration(dateNow, closeDay, ABYSS_CLOSE_TIME);
+    return getOngoingAbyssStatus(duration);
+  }
+};
+
+const handleAbyssCloseDay = (dateNow, currentDay, openDay) => {
+  if (dateNow.hour() < ABYSS_CLOSE_TIME) {
+    let duration = getDuration(dateNow, currentDay, ABYSS_CLOSE_TIME);
+    if (
+      dateNow.hour() == ABYSS_CLOSE_TIME - ABYSS_REMIND_OFFSET &&
+      !reminderSent
+    ) {
+      reminderSent = true;
+      remindSubscribers(guild);
+    }
+    return getOngoingAbyssStatus(duration);
+  } else if (
+    dateNow.hour() == ABYSS_CLOSE_TIME &&
+    dateNow.minutes() < ABYSS_CALC_OFFSET
+  ) {
+    let duration = getDuration(
+      dateNow,
+      currentDay,
+      ABYSS_CLOSE_TIME,
+      ABYSS_CALC_OFFSET
+    );
+    resetRemindStatus();
+    return getCalculatingAbyssStatus(duration);
+  } else {
+    let duration = getDuration(dateNow, openDay, ABYSS_OPEN_TIME);
+    return getPreparingAbyssStatus(duration);
+  }
+};
+
+const handleAbyssPreparingDay = (dateNow, openDay) => {
+  let duration = getDuration(dateNow, openDay, ABYSS_OPEN_TIME);
+  return getPreparingAbyssStatus(duration);
+};
+
+const handleAbyssOngoingDay = (dateNow, closeDay) => {
+  let duration = getDuration(dateNow, closeDay, ABYSS_CLOSE_TIME);
+  return getOngoingAbyssStatus(duration);
+};
+
+const setAbyssStatus = () => {
   let dateNow = moment();
   let currentDay = dateNow.day();
 
   switch (currentDay) {
     case daysOfWeek.MONDAY: {
-      let duration = getDuration(dateNow, daysOfWeek.TUESDAY, ABYSS_OPEN_TIME);
-      return getPreparingAbyssStatus(duration);
+      return handleAbyssOpenDay(dateNow, currentDay);
     }
     case daysOfWeek.TUESDAY: {
-      if (dateNow.hour() < ABYSS_OPEN_TIME) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.TUESDAY,
-          ABYSS_OPEN_TIME
-        );
-        return getPreparingAbyssStatus(duration);
-      } else {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.THURSDAY,
-          ABYSS_CLOSE_TIME
-        );
-        return getOngoingAbyssStatus(duration);
-      }
+      return handleAbyssOngoingDay(dateNow, daysOfWeek.WEDNESDAY);
     }
     case daysOfWeek.WEDNESDAY: {
-      let duration = getDuration(
-        dateNow,
-        daysOfWeek.THURSDAY,
-        ABYSS_CLOSE_TIME
-      );
-      return getOngoingAbyssStatus(duration);
+      return handleAbyssCloseDay(dateNow, currentDay, daysOfWeek.FRIDAY);
     }
     case daysOfWeek.THURSDAY: {
-      if (dateNow.hour() < ABYSS_CLOSE_TIME) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.THURSDAY,
-          ABYSS_CLOSE_TIME
-        );
-        if (
-          dateNow.hour() == ABYSS_CLOSE_TIME - ABYSS_REMIND_OFFSET &&
-          !reminderSent
-        ) {
-          reminderSent = true;
-          remindSubscribers(guild);
-        }
-        return getOngoingAbyssStatus(duration);
-      } else if (
-        dateNow.hour() == ABYSS_CLOSE_TIME &&
-        dateNow.minutes() < ABYSS_CALC_OFFSET
-      ) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.THURSDAY,
-          ABYSS_CLOSE_TIME,
-          ABYSS_CALC_OFFSET
-        );
-        resetRemindStatus();
-        return getCalculatingAbyssStatus(duration);
-      } else {
-        let duration = getDuration(dateNow, daysOfWeek.FRIDAY, ABYSS_OPEN_TIME);
-        return getPreparingAbyssStatus(duration);
-      }
+      return handleAbyssPreparingDay(dateNow, daysOfWeek.FRIDAY);
     }
     case daysOfWeek.FRIDAY: {
-      if (dateNow.hour() < ABYSS_OPEN_TIME) {
-        let duration = getDuration(dateNow, daysOfWeek.FRIDAY, ABYSS_OPEN_TIME);
-        return getPreparingAbyssStatus(duration);
-      } else {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.SUNDAY,
-          ABYSS_CLOSE_TIME
-        );
-        return getOngoingAbyssStatus(duration);
-      }
+      return handleAbyssOpenDay(dateNow, currentDay, daysOfWeek.SUNDAY);
     }
     case daysOfWeek.SATURDAY: {
-      let duration = getDuration(dateNow, daysOfWeek.SUNDAY, ABYSS_CLOSE_TIME);
-      return getOngoingAbyssStatus(duration);
+      return handleAbyssOngoingDay(dateNow, daysOfWeek.SUNDAY);
     }
     case daysOfWeek.SUNDAY: {
-      if (dateNow.hour() < ABYSS_CLOSE_TIME) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.SUNDAY,
-          ABYSS_CLOSE_TIME
-        );
-        if (
-          dateNow.hour() == ABYSS_CLOSE_TIME - ABYSS_REMIND_OFFSET &&
-          !reminderSent
-        ) {
-          reminderSent = true;
-          remindSubscribers(guild);
-        }
-        return getOngoingAbyssStatus(duration);
-      } else if (
-        dateNow.hour() == ABYSS_CLOSE_TIME &&
-        dateNow.minutes() < ABYSS_CALC_OFFSET
-      ) {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.SUNDAY,
-          ABYSS_CLOSE_TIME,
-          ABYSS_CALC_OFFSET
-        );
-        resetRemindStatus();
-        return getCalculatingAbyssStatus(duration);
-      } else {
-        let duration = getDuration(
-          dateNow,
-          daysOfWeek.TUESDAY,
-          ABYSS_OPEN_TIME
-        );
-        return getPreparingAbyssStatus(duration);
-      }
+      return handleAbyssCloseDay(dateNow, currentDay, daysOfWeek.TUESDAY);
     }
   }
 };

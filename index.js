@@ -25,7 +25,9 @@ client.on("ready", () => {
     } channels of ${client.guilds.size} guilds.`
   );
   client.user.setActivity(`Thighs save lives`);
-  client.guilds.forEach(guild => timers.handleBotRestart(guild));
+  client.guilds.forEach(guild =>
+    timers.handleBotRestart(guild, Discord.Permissions)
+  );
 });
 
 client.on("guildCreate", guild => {
