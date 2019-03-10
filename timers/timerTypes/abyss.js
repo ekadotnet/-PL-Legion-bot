@@ -62,7 +62,7 @@ const handleAbyssOpenDay = (dateNow, currentDay, closeDay) => {
   }
 };
 
-const handleAbyssCloseDay = (dateNow, currentDay, openDay) => {
+const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild) => {
   if (dateNow.hour() < ABYSS_CLOSE_TIME) {
     let duration = getDuration(dateNow, currentDay, ABYSS_CLOSE_TIME);
     if (
@@ -101,7 +101,7 @@ const handleAbyssOngoingDay = (dateNow, closeDay) => {
   return getOngoingAbyssStatus(duration);
 };
 
-const setAbyssStatus = () => {
+const setAbyssStatus = guild => {
   let dateNow = moment();
   let currentDay = dateNow.day();
 
@@ -113,7 +113,7 @@ const setAbyssStatus = () => {
       return handleAbyssOngoingDay(dateNow, daysOfWeek.WEDNESDAY);
     }
     case daysOfWeek.WEDNESDAY: {
-      return handleAbyssCloseDay(dateNow, currentDay, daysOfWeek.FRIDAY);
+      return handleAbyssCloseDay(dateNow, currentDay, daysOfWeek.FRIDAY, guild);
     }
     case daysOfWeek.THURSDAY: {
       return handleAbyssPreparingDay(dateNow, daysOfWeek.FRIDAY);
@@ -125,7 +125,7 @@ const setAbyssStatus = () => {
       return handleAbyssOngoingDay(dateNow, daysOfWeek.SUNDAY);
     }
     case daysOfWeek.SUNDAY: {
-      return handleAbyssCloseDay(dateNow, currentDay, daysOfWeek.TUESDAY);
+      return handleAbyssCloseDay(dateNow, currentDay, daysOfWeek.TUESDAY, guild);
     }
   }
 };
