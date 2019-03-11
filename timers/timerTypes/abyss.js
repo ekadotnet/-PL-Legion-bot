@@ -107,7 +107,7 @@ const setAbyssStatus = guild => {
 
   switch (currentDay) {
     case daysOfWeek.MONDAY: {
-      return handleAbyssOpenDay(dateNow, currentDay);
+      return handleAbyssOpenDay(dateNow, currentDay, daysOfWeek.WEDNESDAY);
     }
     case daysOfWeek.TUESDAY: {
       return handleAbyssOngoingDay(dateNow, daysOfWeek.WEDNESDAY);
