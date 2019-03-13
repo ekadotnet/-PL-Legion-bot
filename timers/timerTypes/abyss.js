@@ -26,7 +26,7 @@ const addSubscriber = async message => {
         member: message.member.nickname
       })
   );
-  await sender.sendMessage(channel, msg);
+  await sender.sendMessage(message.channel, msg);
 };
 
 const resetRemindStatus = () => {
