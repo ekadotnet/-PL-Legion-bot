@@ -1,6 +1,6 @@
 const sender = require("../commands/shared/sender");
 const handler = require("../commands/shared/logger");
-const { setAbyssStatus } = require("./timerTypes/abyss");
+const { setAbyssStatus, addSubscriber } = require("./timerTypes/abyss");
 const { setOpenWorldStatus } = require("./timerTypes/openWorld");
 const {
   commandType,

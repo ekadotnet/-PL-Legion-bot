@@ -131,5 +131,6 @@ const setAbyssStatus = guild => {
 };
 
 module.exports = {
-  setAbyssStatus: setAbyssStatus
+  setAbyssStatus: setAbyssStatus,
+  addSubscriber: addSubscriber
 };
