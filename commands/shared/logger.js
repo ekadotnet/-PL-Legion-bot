@@ -1,7 +1,7 @@
 const logger = require("js-logger");
 
 logger.useDefaults();
-logger.setLevel(logger.DEBUG);
+logger.setLevel(logger.INFO);
 
 const onResolved = (func, params = undefined) => {
   logger.debug(`Promise resolved in: ${func.name}\n`);

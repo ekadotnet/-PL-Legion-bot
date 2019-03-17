@@ -4,7 +4,7 @@ const client = new Discord.Client();
 const utils = require("./commands/utils/utils.js");
 const reddit = require("./commands/reddit/reddit.js");
 const danbooru = require("./commands/danbooru/danbooru.js");
-const handler = require("./commands/shared/logger.js");
+const logger = require("./commands/shared/logger.js");
 const timers = require("./timers/timerHandler.js");
 
 const commands = {
@@ -19,7 +19,7 @@ const commands = {
 };
 
 client.on("ready", () => {
-  handler.log(
+  logger.log(
     `Bot has started, with ${client.users.size} users, in ${
       client.channels.size
     } channels of ${client.guilds.size} guilds.`
@@ -31,7 +31,7 @@ client.on("ready", () => {
 });
 
 client.on("guildCreate", guild => {
-  handler.log(
+  logger.log(
     `New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${
       guild.memberCount
     } members!`
@@ -40,12 +40,12 @@ client.on("guildCreate", guild => {
 });
 
 client.on("guildDelete", guild => {
-  handler.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
+  logger.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
   client.user.setActivity(`Thighs save lives`);
 });
 
 client.on("error", error => {
-  handler.onError(error);
+  logger.onError(error);
 });
 
 client.on("message", async message => {
