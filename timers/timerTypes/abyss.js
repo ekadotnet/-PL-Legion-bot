@@ -1,5 +1,6 @@
 const moment = require("moment");
 const sender = require("../../commands/shared/sender.js");
+const logger = require("../../commands/shared/logger.js");
 const { getDuration } = require("../duration.js");
 const {
   daysOfWeek,
@@ -77,13 +78,17 @@ const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild) => {
     dateNow.hour() == ABYSS_CLOSE_TIME &&
     dateNow.minutes() < ABYSS_CALC_OFFSET
   ) {
+    logger.log(`reminderSent: ${reminderSent}, Abyss Calculating`);
     let duration = getDuration(
       dateNow,
       currentDay,
       ABYSS_CLOSE_TIME,
       ABYSS_CALC_OFFSET
     );
-    resetRemindStatus();
+    if (reminderSent) {
+      logger.log(`reminderSent: ${reminderSent}, resetting reminder status`);
+      resetRemindStatus();
+    }
     return getCalculatingAbyssStatus(duration);
   } else {
     let duration = getDuration(dateNow, openDay, ABYSS_OPEN_TIME);
@@ -125,7 +130,12 @@ const setAbyssStatus = guild => {
       return handleAbyssOngoingDay(dateNow, daysOfWeek.SUNDAY);
     }
     case daysOfWeek.SUNDAY: {
-      return handleAbyssCloseDay(dateNow, currentDay, daysOfWeek.TUESDAY, guild);
+      return handleAbyssCloseDay(
+        dateNow,
+        currentDay,
+        daysOfWeek.TUESDAY,
+        guild
+      );
     }
   }
 };
