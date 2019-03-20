@@ -66,6 +66,10 @@ const handleAbyssOpenDay = (dateNow, currentDay, closeDay) => {
 const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild) => {
   if (dateNow.hour() < ABYSS_CLOSE_TIME) {
     let duration = getDuration(dateNow, currentDay, ABYSS_CLOSE_TIME);
+    logger.log(`reminderSent: ${reminderSent}, Abyss Ongoing`);
+    logger.log(
+      dateNow.hour() == ABYSS_CLOSE_TIME - ABYSS_REMIND_OFFSET && !reminderSent
+    );
     if (
       dateNow.hour() == ABYSS_CLOSE_TIME - ABYSS_REMIND_OFFSET &&
       !reminderSent
