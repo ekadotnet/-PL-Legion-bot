@@ -1,5 +1,5 @@
 const sender = require("../commands/shared/sender");
-const handler = require("../commands/shared/logger");
+const logger = require("../commands/shared/logger");
 const { setAbyssStatus, addSubscriber } = require("./timerTypes/abyss");
 const { setOpenWorldStatus } = require("./timerTypes/openWorld");
 const {
@@ -15,11 +15,10 @@ const timersUp = (guild, permissions) => {
   init(guild, permissions).then(
     () => {
       start(guild);
-      handler.onResolved(handleCommand, { guild: guild.name });
+      logger.onResolved(handleCommand, { guild: guild.name });
     },
     reason =>
-      handler.onRejected(reason, handleCommand, {
-        args: args,
+      logger.onRejected(reason, handleCommand, {
         guild: guild.id,
         guildName: guild.name,
         channel: channel.name
@@ -28,6 +27,9 @@ const timersUp = (guild, permissions) => {
 };
 
 const handleCommand = async (message, args, permissions) => {
+  if (args === undefined) {
+    await sender.getHelp(message.channel, message.author.id, timersDescription);
+  }
   switch (args[0]) {
     case commandType.START: {
       if (!message.member.hasPermission(permissions.FLAGS.ADMINISTRATOR)) {
@@ -95,23 +97,23 @@ const createAbyssTimer = (guild, permissions, skip) => {
         .then(
           channel => {
             channel.setParent(category).then(
-              () => handler.onResolved(init, { guild: guild.name }),
+              () => logger.onResolved(init, { guild: guild.name }),
               reason => {
-                return handler.onRejected(reason, createChannel, {
+                return logger.onRejected(reason, createChannel, {
                   step: `Set Abyss timer parent`
                 });
               }
             );
           },
           reason => {
-            return handler.onRejected(reason, createChannel, {
+            return logger.onRejected(reason, createChannel, {
               step: `Create Abyss timer`
             });
           }
         );
     },
     reason => {
-      return handler.onRejected(reason, createChannel, {
+      return logger.onRejected(reason, createChannel, {
         step: `Create Abyss category`
       });
     }
@@ -134,23 +136,23 @@ const createOwTimer = (guild, permissions, skip) => {
         .then(
           channel => {
             channel.setParent(category).then(
-              () => handler.onResolved(init, { guild: guild.name }),
+              () => logger.onResolved(init, { guild: guild.name }),
               reason => {
-                return handler.onRejected(reason, createChannel, {
+                return logger.onRejected(reason, createChannel, {
                   step: `Set Open World timer parent`
                 });
               }
             );
           },
           reason => {
-            return handler.onRejected(reason, createChannel, {
+            return logger.onRejected(reason, createChannel, {
               step: `Create Open World timer`
             });
           }
         );
     },
     reason => {
-      return handler.onRejected(reason, createChannel, {
+      return logger.onRejected(reason, createChannel, {
         step: `Create Open World category`
       });
     }
@@ -170,11 +172,11 @@ const createReminderChannel = (guild, permissions, skip) => {
     ])
     .then(
       () =>
-        handler.onResolved(init, {
+        logger.onResolved(init, {
           guild: guild.name
         }),
       reason => {
-        return handler.onRejected(reason, createChannel, {
+        return logger.onRejected(reason, createChannel, {
           step: `Create subscriber channel`
         });
       }
@@ -192,11 +194,11 @@ const createSubscriberRole = (guild, skip) => {
     })
     .then(
       () =>
-        handler.onResolved(init, {
+        logger.onResolved(init, {
           guild: guild.name
         }),
       reason => {
-        return handler.onRejected(reason, createChannel, {
+        return logger.onRejected(reason, createChannel, {
           step: `Create subscriber role`
         });
       }
@@ -232,12 +234,12 @@ const updateStatus = guild => {
         channel
           .setName(setAbyssStatus(guild))
           .then(
-            () => handler.onResolved(setAbyssStatus),
-            reason => handler.onRejected(reason, setAbyssStatus)
+            () => logger.onResolved(setAbyssStatus),
+            reason => logger.onRejected(reason, setAbyssStatus)
           )
       );
     } catch (error) {
-      handler.onError(error);
+      logger.onError(error);
     }
 
     let openWorldCategory = guild.channels.find(channel =>
@@ -247,16 +249,16 @@ const updateStatus = guild => {
       openWorldCategory.children.forEach(channel =>
         channel.setName(setOpenWorldStatus()).then(
           () => {
-            handler.onResolved(setOpenWorldStatus);
+            logger.onResolved(setOpenWorldStatus);
           },
-          reason => handler.onRejected(reason, setOpenWorldStatus)
+          reason => logger.onRejected(reason, setOpenWorldStatus)
         )
       );
     } catch (error) {
-      handler.onError(error);
+      logger.onError(error);
     }
   } else {
-    handler.log("clearTimeout");
+    logger.log("clearTimeout");
     clearTimeout(timeout);
   }
 };
