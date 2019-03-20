@@ -20,8 +20,7 @@ const timersUp = (guild, permissions) => {
     reason =>
       logger.onRejected(reason, handleCommand, {
         guild: guild.id,
-        guildName: guild.name,
-        channel: channel.name
+        guildName: guild.name
       })
   );
 };
