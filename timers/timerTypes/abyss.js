@@ -38,6 +38,8 @@ const remindSubscribers = guild => {
   let role = guild.roles.find(r => r.name === SUBSCRIBER_ROLE);
   let channel = guild.channels.find(channel => channel.name == `reminder-chan`);
 
+  logger.log(`reminding: ${role}\n ${channel}`);
+
   sender.sendRoleMention(channel, role, SUBSCRIBER_MSG);
 };
 
@@ -66,10 +68,6 @@ const handleAbyssOpenDay = (dateNow, currentDay, closeDay) => {
 const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild) => {
   if (dateNow.hour() < ABYSS_CLOSE_TIME) {
     let duration = getDuration(dateNow, currentDay, ABYSS_CLOSE_TIME);
-    logger.log(`reminderSent: ${reminderSent}, Abyss Ongoing`);
-    logger.log(
-      dateNow.hour() == ABYSS_CLOSE_TIME - ABYSS_REMIND_OFFSET && !reminderSent
-    );
     if (
       dateNow.hour() == ABYSS_CLOSE_TIME - ABYSS_REMIND_OFFSET &&
       !reminderSent
@@ -82,7 +80,6 @@ const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild) => {
     dateNow.hour() == ABYSS_CLOSE_TIME &&
     dateNow.minutes() < ABYSS_CALC_OFFSET
   ) {
-    logger.log(`reminderSent: ${reminderSent}, Abyss Calculating`);
     let duration = getDuration(
       dateNow,
       currentDay,
@@ -90,7 +87,6 @@ const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild) => {
       ABYSS_CALC_OFFSET
     );
     if (reminderSent) {
-      logger.log(`reminderSent: ${reminderSent}, resetting reminder status`);
       resetRemindStatus();
     }
     return getCalculatingAbyssStatus(duration);
