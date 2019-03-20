@@ -12,6 +12,9 @@ const {
 var isRunning = true;
 
 const timersUp = (guild, permissions) => {
+  if(!checkIfAbyssTimerExists(guild)){
+    return;
+  }
   init(guild, permissions).then(
     () => {
       start(guild);
