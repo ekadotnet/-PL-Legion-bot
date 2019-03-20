@@ -34,13 +34,18 @@ const resetRemindStatus = () => {
   reminderSent = false;
 };
 
-const remindSubscribers = guild => {
+const remindSingleGuild = guild => {
   let role = guild.roles.find(r => r.name === SUBSCRIBER_ROLE);
   let channel = guild.channels.find(channel => channel.name == `reminder-chan`);
 
   logger.log(`reminding: ${role}\n ${channel}`);
 
   sender.sendRoleMention(channel, role, SUBSCRIBER_MSG);
+};
+
+const remindSubscribers = (guild, client) => {
+  logger.log(`for each`);
+  client.guilds.forEach(guild => remindSingleGuild(guild));
 };
 
 const getOngoingAbyssStatus = duration => {
@@ -65,7 +70,7 @@ const handleAbyssOpenDay = (dateNow, currentDay, closeDay) => {
   }
 };
 
-const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild) => {
+const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild, client) => {
   if (dateNow.hour() < ABYSS_CLOSE_TIME) {
     let duration = getDuration(dateNow, currentDay, ABYSS_CLOSE_TIME);
     if (
@@ -73,7 +78,7 @@ const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild) => {
       !reminderSent
     ) {
       reminderSent = true;
-      remindSubscribers(guild);
+      remindSubscribers(guild, client);
     }
     return getOngoingAbyssStatus(duration);
   } else if (
@@ -106,7 +111,7 @@ const handleAbyssOngoingDay = (dateNow, closeDay) => {
   return getOngoingAbyssStatus(duration);
 };
 
-const setAbyssStatus = guild => {
+const setAbyssStatus = (guild, client) => {
   let dateNow = moment();
   let currentDay = dateNow.day();
 
@@ -118,7 +123,13 @@ const setAbyssStatus = guild => {
       return handleAbyssOngoingDay(dateNow, daysOfWeek.WEDNESDAY);
     }
     case daysOfWeek.WEDNESDAY: {
-      return handleAbyssCloseDay(dateNow, currentDay, daysOfWeek.FRIDAY, guild);
+      return handleAbyssCloseDay(
+        dateNow,
+        currentDay,
+        daysOfWeek.FRIDAY,
+        guild,
+        client
+      );
     }
     case daysOfWeek.THURSDAY: {
       return handleAbyssPreparingDay(dateNow, daysOfWeek.FRIDAY);
@@ -134,7 +145,8 @@ const setAbyssStatus = guild => {
         dateNow,
         currentDay,
         daysOfWeek.TUESDAY,
-        guild
+        guild,
+        client
       );
     }
   }

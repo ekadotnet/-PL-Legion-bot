@@ -26,7 +26,7 @@ client.on("ready", () => {
   );
   client.user.setActivity(`Thighs save lives`);
   client.guilds.forEach(guild =>
-    timers.handleBotRestart(guild, Discord.Permissions)
+    timers.handleBotRestart(guild, Discord.Permissions, client)
   );
 });
 
@@ -80,7 +80,7 @@ client.on("message", async message => {
       break;
     }
     case commands.TIMERS: {
-      await timers.handleCommand(message, args, Discord.Permissions);
+      await timers.handleCommand(message, args, Discord.Permissions, client);
       break;
     }
     case commands.COMMANDS:

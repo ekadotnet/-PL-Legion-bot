@@ -11,13 +11,13 @@ const {
 
 var isRunning = true;
 
-const timersUp = (guild, permissions) => {
-  if(!checkIfAbyssTimerExists(guild)){
+const timersUp = (guild, permissions, client) => {
+  if (!checkIfAbyssTimerExists(guild)) {
     return;
   }
   init(guild, permissions).then(
     () => {
-      start(guild);
+      start(guild, client);
       logger.onResolved(handleCommand, { guild: guild.name });
     },
     reason =>
@@ -28,7 +28,7 @@ const timersUp = (guild, permissions) => {
   );
 };
 
-const handleCommand = async (message, args, permissions) => {
+const handleCommand = async (message, args, permissions, client) => {
   if (args === undefined) {
     await sender.getHelp(message.channel, message.author.id, timersDescription);
   }
@@ -37,7 +37,7 @@ const handleCommand = async (message, args, permissions) => {
       if (!message.member.hasPermission(permissions.FLAGS.ADMINISTRATOR)) {
         return;
       }
-      timersUp(message.guild, permissions);
+      timersUp(message.guild, permissions, client);
       break;
     }
     case commandType.STOP: {
@@ -79,8 +79,8 @@ const checkIfReminderChannelExists = guild => {
   );
 };
 
-const handleBotRestart = (guild, permissions) => {
-  timersUp(guild, permissions);
+const handleBotRestart = (guild, permissions, client) => {
+  timersUp(guild, permissions, client);
 };
 
 const createAbyssTimer = (guild, permissions, skip) => {
@@ -225,8 +225,8 @@ const init = (guild, permissions) => {
   );
 };
 
-const updateStatus = guild => {
-  let timeout = setTimeout(() => updateStatus(guild), REFRESH_RATE);
+const updateStatus = (guild, client) => {
+  let timeout = setTimeout(() => updateStatus(guild, client), REFRESH_RATE);
   if (isRunning) {
     let abyssCategory = guild.channels.find(channel =>
       channel.name.startsWith("Abyss")
@@ -234,7 +234,7 @@ const updateStatus = guild => {
     try {
       abyssCategory.children.forEach(channel =>
         channel
-          .setName(setAbyssStatus(guild))
+          .setName(setAbyssStatus(guild, client))
           .then(
             () => logger.onResolved(setAbyssStatus),
             reason => logger.onRejected(reason, setAbyssStatus)
@@ -265,9 +265,9 @@ const updateStatus = guild => {
   }
 };
 
-const start = guild => {
+const start = (guild, client) => {
   isRunning = true;
-  updateStatus(guild);
+  updateStatus(guild, client);
 };
 
 const stop = () => {
