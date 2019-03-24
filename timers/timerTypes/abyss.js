@@ -35,10 +35,19 @@ const resetRemindStatus = () => {
 };
 
 const remindSingleGuild = guild => {
+  if (guild.roles == undefined) {
+    return;
+  }
   let role = guild.roles.find(r => r.name === SUBSCRIBER_ROLE);
+
+  if (guild.channels == undefined) {
+    return;
+  }
   let channel = guild.channels.find(channel => channel.name == `reminder-chan`);
 
-  logger.log(`reminding: ${role}\n ${channel}`);
+  if (role == null || channel == null) {
+    return;
+  }
 
   sender.sendRoleMention(channel, role, SUBSCRIBER_MSG);
 };
