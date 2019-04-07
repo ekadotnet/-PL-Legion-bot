@@ -71,6 +71,7 @@ const getCalculatingAbyssStatus = duration => {
 
 const handleAbyssOpenDay = (dateNow, currentDay, closeDay) => {
   if (dateNow.hour() < ABYSS_OPEN_TIME) {
+    logger.log(`${dateNow}::${currentDay}::${closeDay}`);
     let duration = getDuration(dateNow, currentDay, ABYSS_OPEN_TIME);
     return getPreparingAbyssStatus(duration);
   } else {
