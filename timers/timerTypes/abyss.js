@@ -81,6 +81,7 @@ const handleAbyssOpenDay = (dateNow, currentDay, closeDay) => {
 };
 
 const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild, client) => {
+  logger.log(`closeday::${dateNow}::${currentDay}::${openDay}`);
   if (dateNow.hour() < ABYSS_CLOSE_TIME) {
     let duration = getDuration(dateNow, currentDay, ABYSS_CLOSE_TIME);
     if (
@@ -112,11 +113,13 @@ const handleAbyssCloseDay = (dateNow, currentDay, openDay, guild, client) => {
 };
 
 const handleAbyssPreparingDay = (dateNow, openDay) => {
+  logger.log(`preparingday::${dateNow}::${openDay}`);
   let duration = getDuration(dateNow, openDay, ABYSS_OPEN_TIME);
   return getPreparingAbyssStatus(duration);
 };
 
 const handleAbyssOngoingDay = (dateNow, closeDay) => {
+  logger.log(`ongoingday::${dateNow}::${closeDay}`);
   let duration = getDuration(dateNow, closeDay, ABYSS_CLOSE_TIME);
   return getOngoingAbyssStatus(duration);
 };
@@ -124,6 +127,8 @@ const handleAbyssOngoingDay = (dateNow, closeDay) => {
 const setAbyssStatus = (guild, client) => {
   let dateNow = moment();
   let currentDay = dateNow.day();
+
+  logger.log(`currentday::${dateNow}:: ${currentDay}`)
 
   switch (currentDay) {
     case daysOfWeek.MONDAY: {
